@@ -30,9 +30,13 @@ knitr::opts_chunk$set(echo = TRUE)
 *Hint*: We learned how to inspect a dataset in `e-data-00-basics`!
 
 ```{r q1-task, eval=FALSE}
+?diamonds
 ```
 
 ### __q2__ Use your "standard checks" to determine what variables the dataset has.
+```{r}
+glimpse(diamonds)
+```
 
 
 Now that we have the list of variables in the dataset, we know what we can visualize!
@@ -46,12 +50,15 @@ y` pairs. Language is hard!
 
 ```{r q3-task}
 ## TODO: Complete this code
-ggplot(diamonds)
+ggplot(diamonds) +
+  geom_point(aes(x = carat, y = price))
 ```
 
 **Observations**:
 
 - (Write your observations here!)
+there seems to be surges of 1, 1.5, and 2 carat diamonds conveniently clustered together. though the
+prices vary a lot from 1-2 carats
 
 ## A note on *aesthetics*
 
@@ -69,12 +76,14 @@ simultaneously.
 
 ```{r q4-task}
 ## TODO: Complete this code
-ggplot(diamonds)
+ggplot(diamonds) +
+  geom_point(aes(x = carat, y= price, color = cut))
 ```
 
 **Observations**:
 
-- (Write your observations here!)
+- better the cut the more expensive,vice versa, though bigger diamonds fetch higher price in general too
+- higher the carat, generally more expensive the price
 
 <!-- include-exit-ticket -->
 # Exit Ticket

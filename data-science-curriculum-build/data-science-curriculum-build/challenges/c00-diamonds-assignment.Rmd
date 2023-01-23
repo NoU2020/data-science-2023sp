@@ -55,22 +55,27 @@ In this first stage, you will explore the `diamonds` dataset and document your o
 ```{r q1-task}
 ## TASK: Plot `price` vs `carat` below
 ## Your code here!
+ggplot(diamonds) +
+  geom_point(aes(x= carat, y = price))
 ```
 
 **Observations**:
 
-- (Write your observations here!)
+- there seems to be surges of 1, 1.5, and 2 carat diamonds conveniently clustered together. though the prices vary a lot from 1-2 carats
 
 ### __q2__ Create a visualization showing variables `carat`, `price`, and `cut` simultaneously. Experiment with which variable you assign to which aesthetic (`x`, `y`, etc.) to find an effective visual.
 
 ```{r q2-task}
 ## TASK: Plot `price`, `carat`, and `cut` below
 ## Your code here!
+ggplot(diamonds) +
+  geom_point(aes(x= carat, y = price, color = cut))
 ```
 
 **Observations**:
 
-- (Write your observations here!)
+- better the cut the more expensive,vice versa, though bigger diamonds fetch higher price in general too
+- higher the carat, generally more expensive the price
 
 
 # Communication
