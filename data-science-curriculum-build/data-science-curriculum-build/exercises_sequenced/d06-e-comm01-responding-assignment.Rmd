@@ -94,8 +94,11 @@ Here the bolded response is *actively* engaging with your colleague's question, 
 **Observations**:
 
 - Is the bolded response **active** or **passive**? Why?
+It is active because the response is actively engaging the question.
 - Is the bolded response **constructive** or **destructive**? Why?
+It is a constructive because the response is creating a positive emotion to the colleague that found the errors in the graph.
 - How does this statement make you *feel*, relative to the bolded statement before the q1 prompt?
+It makes me feel like my question is valid and being valued. I will bring the presenter candys.
 
 ### __q2__ Identify the nature of the bolded line below, rating it as either **active vs passive** and **constructive vs destructive**.
 
@@ -108,8 +111,11 @@ Here the bolded response is *actively* engaging with your colleague's question, 
 **Observations**:
 
 - Is the bolded response **active** or **passive**? Why?
+The response is passive because the response is not addressing the question
 - Is the bolded response **constructive** or **destructive**? Why?
+The response is constructive but also implying negative emotions because they are ignoring the question :(
 - How does this statement make you *feel*, relative to the bolded statement before the q1 prompt?
+Well I don't feel quiet as bad, but I probably wont be asking questions during the presentation anymore. 
 
 **Intermediate Conclusion**: We can quite naturally think of discussion responses in the APCD framework. Therefore, we should try to give active and constructive responses in data discussions!
 
@@ -175,7 +181,9 @@ Let's practice once more!
 **Observations**:
 
 - Is the bolded response **active** or **passive**? Why?
+It is passive because it has nothing to do with the presentation and distracts others from the presentation.
 - Is the bolded response **constructive** or **destructive**? Why?
+It doesn't really envoke emotions since its just a neutral question, though further discussions might lead to depressing and sad answers.
 
 <!-- include-exit-ticket -->
 # Exit Ticket

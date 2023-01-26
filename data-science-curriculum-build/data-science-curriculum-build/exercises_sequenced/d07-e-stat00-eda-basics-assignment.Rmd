@@ -44,6 +44,7 @@ library(tidyverse)
 to do? Do those simple checks on the diamonds dataset below.
 
 ```{r q0-task}
+diamonds %>% glimpse()
 ```
 
 I'm going to walk you through a train of thought I had when studying the
@@ -70,7 +71,8 @@ diamonds %>%
 ```
 
 **Observations**:
-- Write your observations here!
+- Hypothesis 1 does not seem correct, there are way more ideal diamonds than other cuts.
+- This could be ideal diamonds are more valuable/popular so less valuable cuts aren't made/sold
 
 ## Hypothesis 2
 
@@ -87,7 +89,7 @@ diamonds %>%
 ```
 
 **Observations**:
-- Write your observations here!
+- Well I can only see lines, I can't really see the different data points or the amount of data. I cant tell anything from this graph.
 
 The following is a set of *boxplots*; the middle bar denotes the median, the
 boxes denote the *quartiles* (upper and lower "quarters" of the data), and the
@@ -102,7 +104,7 @@ diamonds %>%
 ```
 
 **Observations**:
-- Write your observations here!
+- On average, ideal actually seems to be cheaper than fair, though it could be that theres less fair cuts than ideal cuts and maybe it has a small data set?
 
 ## Unraveling Hypothesis 2
 
@@ -110,6 +112,8 @@ Upon making the graph in __q2.2__, I was very surprised. So I did some reading
 on diamond cuts. It turns out that some gemcutters [sacrifice cut for
 carat](https://en.wikipedia.org/wiki/Diamond_(gemstone)#Cut). Could this effect
 explain the surprising pattern above?
+
+Maybe!
 
 ### __q3__ Study the following graph; does it support a "carat over cut" hypothesis? How might this relate to price?
 
@@ -122,7 +126,7 @@ diamonds %>%
 ```
 
 **Observations**:
-- Write your observations here!
+- Hmm, I can see Cut is not a definitive factor in determining the price of diamonds. However, it is still unclear if carat is a bigger/smaller influence from this graph alone.
 
 ## Footnotes
 
