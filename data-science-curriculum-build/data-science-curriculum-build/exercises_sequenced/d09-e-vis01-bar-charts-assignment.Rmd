@@ -33,8 +33,9 @@ the same visual using `geom_col()`.
 
 ```{r q1-task}
 mpg %>%
-  ggplot(aes(trans)) +
-  geom_bar()
+  count(trans) %>% 
+  ggplot(mapping =aes(x=trans, y=n)) +
+  geom_col()
 ```
 
 The reading mentioned that when using `geom_col()` our x-y data should be
