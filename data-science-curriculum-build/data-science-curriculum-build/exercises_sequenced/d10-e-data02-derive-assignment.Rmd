@@ -41,6 +41,8 @@ filter(diamonds, cut == "Ideal")
 diamonds %>% filter(cut == "Ideal")
 ```
 
+They output the same thing, but version 2 loads the data first and pipes it down the function as the first argument.
+
 
 The reading mentioned various kinds of *summary functions*, which are summarized
 in the table below:
@@ -58,7 +60,9 @@ in the table below:
 ### __q2__ Using `summarize()` and a logical summary function, determine the number of rows with `Ideal` `cut`. Save this value to a column called `n_ideal`.
 
 ```{r q2-task}
-df_q2
+df_q2 <-
+  diamonds %>% 
+    summarize(n_ideal = sum(cut ==  "Ideal"))
 ```
 
 The following test will verify that your `df_q2` is correct:
@@ -78,9 +82,10 @@ print("Great job!")
 
 ```{r q3-task}
 diamonds %>%
-  ## group_by(color, clarity) %>%
+  group_by(color, clarity) %>%
   summarize(price = mean(price))
 ```
+For the first summarize, all it does is to list a mean of all prices. For the second one, the function lists all combinations of color and clarity and computes the mean price of that.
 
 
 ### Vectorized Functions
@@ -111,7 +116,22 @@ tibble to `df_q4`, and assign the appropriate values to `cov_depth` and
 ```{r q4-task}
 ## TODO: Compute the `cov_depth` and `cov_diff` and assign the result to df_q4
 df_q4 <-
-  diamonds
+  diamonds %>% 
+    mutate(
+      depth_computed = 100 * 2 * z / (x + y),
+      diff = depth - depth_computed
+    ) %>% 
+      summarize(
+        depth_mean = mean(depth, na.rm=TRUE),
+        diff_mean = mean(diff, na.rm=TRUE),
+        
+        depth_sd = sd(depth, na.rm=TRUE),
+        diff_sd = sd(diff, na.rm=TRUE),
+        
+        cov_depth = depth_sd / depth_mean,
+        cov_diff = diff_sd / diff_mean
+      )
+    
 df_q4
 ```
 
@@ -119,6 +139,8 @@ df_q4
 
 - Comment on the relative values of `cov_depth` and `cov_diff`.
 - Why is `cov_diff` so large?
+cov_depth is on e-2 scale, while cov_diff is on e2 scale, there is 4 magnitudes of difference.
+It could be that the diff_mean is very small to begin with, so a standard deviation of 2 would make the cov really large. 
 
 The following test will verify that your `df_q4` is correct:
 
