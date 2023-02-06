@@ -1,7 +1,7 @@
 ---
 title: "Michelson Speed-of-light Measurements"
-author: "(Your name here)"
-date: 2020-
+author: "Jaclyn Ho"
+date: 2023-02-05
 output:
   github_document:
     toc: true
@@ -84,7 +84,10 @@ df_michelson %>% glimpse
 
 ```{r q1-task}
 ## TODO: Compute summaries
-df_q1 <- NA
+df_q1 <- 
+  df_michelson %>% 
+  group_by(Distinctness) %>% 
+  summarize(n=n(), MeanVelocity = mean(Velocity))
 df_q1 %>%
   arrange(desc(Distinctness)) %>%
   knitr::kable()
@@ -92,10 +95,10 @@ df_q1 %>%
 
 **Observations**:
 - Write your observations here!
-  - (Your response here)
+  - While the distinctness frequency is the same, the specific mean velocity varies quite a bit
 - Why might your table differ from Michelson's?
-  - (Your response here)
-
+  - there could be rounding or calculation differences in computing vs human calculation.
+  
 The `Velocity` values in the dataset are the speed of light *in air*; Michelson
 introduced a couple of adjustments to estimate the speed of light in a vacuum.
 In total, he added $+92$ km/s to his mean estimate for `VelocityVacuum` (from
@@ -107,7 +110,11 @@ observations in the dataset.
 
 ```{r q2-task}
 ## TODO: Adjust the data, assign to df_q2
-df_q2 <- NA
+df_q2 <-
+  df_michelson %>% 
+  mutate(
+    VelocityVacuum=Velocity+92
+  )
 
 df_q2
 ```
@@ -136,13 +143,17 @@ problems uncertainty includes some amount of human judgment.[2]
 ```{r q3-task}
 ## TODO: Compare Michelson's estimate and error against the true value
 ## Your code here!
+True_error=LIGHTSPEED_VACUUM - LIGHTSPEED_MICHELSON
+
+LIGHTSPEED_PM
+True_error
 ```
 
 **Observations**:
 - Is Michelson's estimate of the error (his uncertainty) greater or less than the true error?
-  - (Your response here)
+  - The error is greater than the true error.
 - Make a quantitative comparison between Michelson's uncertainty and his error.
-  - (Your response here)
+  - Michelson's uncertainty is 51, which is the amount of variation in the measurements that would cause the measurement to be inaccurate. However the true error is 151.542, which is significantly larger than 51. This might suggest that the method and equipment of measurement likely had more impact that the variation in the measured data due to how old this experiment was (1879).
 
 The following plot shows all of Michelson's data as a [control chart](https://en.wikipedia.org/wiki/Control_chart); this sort of plot is common in manufacturing, where it is used to help determine if a manufacturing process is under [statistical control](https://en.wikipedia.org/wiki/Statistical_process_control). Each dot is one of Michelson's measurements, and the grey line connects the mean taken for each day. The same plot also shows simulated data using a probability model. We'll get into statistics later in the course; for now, let's focus on understanding what real and simulated data tend to look like.
 
@@ -207,15 +218,106 @@ df_q2 %>%
 
 **Observations**:
 Similarities
-- (your responses here)
+- The overall increase and decrease peaks and valleys occur at roughly the same dates. The range stays fairly consistent throughout the measurement dates between 299900 and 300000. The measurements between Jun 16 and 23 are fairly similar between real and simulated.
 Differences
-- (your responses here)
+- The measurements at June 9th is higher than the simulated velocity, while on June 25th the simulated velocity is higher than the real velocity. 
 
 ### __q5__ You have access to a few other variables. Construct a few visualizations of `VelocityVacuum` against these other factors. Are there other patterns in the data that might help explain the difference between Michelson's estimate and `LIGHTSPEED_VACUUM`?
+```{r}
+set.seed(101)
+df_q2 %>%
+  mutate(Simulated = rnorm(n(), mean = v_mean, sd = v_sd)) %>%
+  rename(Real = VelocityVacuum) %>%
+  pivot_longer(
+    cols = c(Simulated, Real),
+    names_to = "source",
+    values_to = "velocity"
+  ) %>%
+
+  ggplot(aes(Temp, velocity)) +
+  geom_hline(
+    yintercept = LIGHTSPEED_MICHELSON,
+    linetype = "dotted"
+  ) +
+  geom_hline(
+    yintercept = LIGHTSPEED_MICHELSON - LIGHTSPEED_PM,
+    linetype = "dashed"
+  ) +
+  geom_hline(
+    yintercept = LIGHTSPEED_MICHELSON + LIGHTSPEED_PM,
+    linetype = "dashed"
+  ) +
+
+  geom_line(
+    data = . %>%
+      group_by(Temp, source) %>%
+      summarize(velocity_mean = mean(velocity)),
+    mapping = aes(y = velocity_mean),
+    color = "grey50"
+  ) +
+  geom_point(
+    mapping = aes(y = velocity),
+    size = 0.8
+  ) +
+
+  facet_grid(source~.) +
+  theme_minimal() +
+  labs(
+    x = "Temperature of Measurement (1879)",
+    y = "Velocity (in Vacuum)"
+  )
+```
+
+```{r}
+set.seed(101)
+df_q2 %>%
+  mutate(Simulated = rnorm(n(), mean = v_mean, sd = v_sd)) %>%
+  rename(Real = VelocityVacuum) %>%
+  pivot_longer(
+    cols = c(Simulated, Real),
+    names_to = "source",
+    values_to = "velocity"
+  ) %>%
+
+  ggplot(aes(Distinctness, velocity)) +
+  geom_hline(
+    yintercept = LIGHTSPEED_MICHELSON,
+    linetype = "dotted"
+  ) +
+  geom_hline(
+    yintercept = LIGHTSPEED_MICHELSON - LIGHTSPEED_PM,
+    linetype = "dashed"
+  ) +
+  geom_hline(
+    yintercept = LIGHTSPEED_MICHELSON + LIGHTSPEED_PM,
+    linetype = "dashed"
+  ) +
+
+  geom_line(
+    data = . %>%
+      group_by(Distinctness, source) %>%
+      summarize(velocity_mean = mean(velocity)),
+    mapping = aes(y = velocity_mean),
+    color = "grey50"
+  ) +
+  geom_point(
+    mapping = aes(y = velocity),
+    size = 0.8
+  ) +
+
+  facet_grid(source~.) +
+  theme_minimal() +
+  labs(
+    x = "Distinctness of Measurement",
+    y = "Velocity (in Vacuum)"
+  )
+```
+
 
 **Observations**:
 
-- Make sure to record observations on your graphs!
+- The more distinctive, the more the measurement tends to fall under the average range. 
+-There also seems to be a correlation with warmer and cooler temperatures.When the temperatures are more extreme (i.e. around 60s or 90s), more deviations tend to appear.
 
 
 
