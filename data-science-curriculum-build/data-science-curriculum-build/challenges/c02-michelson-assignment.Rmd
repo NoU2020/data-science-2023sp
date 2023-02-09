@@ -224,12 +224,22 @@ Differences
 
 ### __q5__ You have access to a few other variables. Construct a few visualizations of `VelocityVacuum` against these other factors. Are there other patterns in the data that might help explain the difference between Michelson's estimate and `LIGHTSPEED_VACUUM`?
 ```{r}
+v_mean <-
+  df_q2 %>%
+  summarize(m = mean(VelocityVacuum)) %>%
+  pull(m)
+v_sd <-
+  df_q2 %>%
+  summarize(s = sd(VelocityVacuum)) %>%
+  pull(s)
+
+## Visualize
 set.seed(101)
 df_q2 %>%
   mutate(Simulated = rnorm(n(), mean = v_mean, sd = v_sd)) %>%
   rename(Real = VelocityVacuum) %>%
   pivot_longer(
-    cols = c(Simulated, Real),
+    cols = c(Real),
     names_to = "source",
     values_to = "velocity"
   ) %>%
@@ -263,7 +273,7 @@ df_q2 %>%
   facet_grid(source~.) +
   theme_minimal() +
   labs(
-    x = "Temperature of Measurement (1879)",
+    x = "Distinctness of Measurement",
     y = "Velocity (in Vacuum)"
   )
 ```
@@ -274,7 +284,7 @@ df_q2 %>%
   mutate(Simulated = rnorm(n(), mean = v_mean, sd = v_sd)) %>%
   rename(Real = VelocityVacuum) %>%
   pivot_longer(
-    cols = c(Simulated, Real),
+    cols = c(Real),
     names_to = "source",
     values_to = "velocity"
   ) %>%
