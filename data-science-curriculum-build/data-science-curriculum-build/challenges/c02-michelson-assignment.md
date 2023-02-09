@@ -251,13 +251,14 @@ True_error
     ## [1] -151.542
 
 **Observations**: - Is Michelson’s estimate of the error (his
-uncertainty) greater or less than the true error? - The error is greater
-than the true error. - Make a quantitative comparison between
-Michelson’s uncertainty and his error. - Michelson’s uncertainty is 51,
-which is the amount of variation in the measurements that would cause
-the measurement to be inaccurate. However the true error is 151.542,
-which is significantly larger than 51. This might suggest that the
-method and equipment of measurement likely had more impact that the
+uncertainty) greater or less than the true error? - The uncertainty
+error is smaller than the true error, which meant Michelson thought he
+was more accurate than he actually was. - Make a quantitative comparison
+between Michelson’s uncertainty and his error. - Michelson’s uncertainty
+is 51, which is the amount of variation in the measurements that would
+cause the measurement to be inaccurate. However the true error is
+151.542, which is significantly larger than 51. This might suggest that
+the method and equipment of measurement likely had more impact that the
 variation in the measured data due to how old this experiment was
 (1879).
 
@@ -460,10 +461,13 @@ df_q2 %>%
 
 **Observations**:
 
-- The more distinctive, the more the measurement tends to fall under the
-  average range. -There also seems to be a correlation with warmer and
-  cooler temperatures.When the temperatures are more extreme
-  (i.e. around 60s or 90s), more deviations tend to appear.
+- The distinctness 3’s measurements cluster more closely towards the
+  mean than distinctness 2 and 1 -There also seems to be a correlation
+  with warmer and cooler temperatures.When the temperatures are more
+  extreme (i.e. around 60s or 90s), more deviations tend to appear.
+  -Based on these observations, there doesn’t appear to be an
+  obvious/explicit reason as to why Michelson’s uncertainty error was
+  less than the true error based on my observations.
 
 ## Bibliography
 
