@@ -39,12 +39,13 @@ your pick!
 ```{r q1-task}
 diamonds %>%
   ## TODO: Use mutate to add the column `carat_cut`
+  mutate(carat_cut = cut_width(carat, width = 0.5, boundary = 0)) %>% 
   ggplot(aes(x = carat_cut, y = price)) +
   geom_boxplot()
 ```
 
 **Observations**
-- Write your observations here!
+- between 0 and 2 carats, the median seems to increase at a linear ish pattern. 
 - Make sure to distinguish between the trend in median (bar), quantiles (box edges), and whiskers (vertical lines)
 
 ### __q2__ The following code visualizes the count of diamonds of *all* carats according to their cut and color. Modify the code to consider *only* diamonds with `carat >= 2`. Does the most common group of cut and color change?
