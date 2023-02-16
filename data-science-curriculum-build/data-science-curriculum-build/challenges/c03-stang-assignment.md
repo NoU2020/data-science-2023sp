@@ -164,7 +164,7 @@ df_stang_long <-
     cols = c("E_00", "E_45", "E_90", "mu_00", "mu_45", "mu_90")
   ) %>% 
   filter(
-    E !=-1 & mu != -1
+    E >=0 & mu >=0
   ) %>% 
   mutate(angle = as.integer(angle))
 df_stang_long
@@ -235,16 +235,13 @@ print("Very good!")
 ``` r
 ##
 df_stang_long %>% 
-  glimpse
+  distinct(alloy)
 ```
 
-    ## Rows: 26
-    ## Columns: 5
-    ## $ thick <dbl> 0.022, 0.022, 0.022, 0.022, 0.022, 0.022, 0.032, 0.032, 0.032, 0…
-    ## $ alloy <chr> "al_24st", "al_24st", "al_24st", "al_24st", "al_24st", "al_24st"…
-    ## $ angle <int> 0, 45, 90, 0, 45, 90, 0, 45, 90, 0, 45, 90, 0, 45, 90, 0, 45, 90…
-    ## $ E     <dbl> 10600, 10700, 10500, 10600, 10500, 10700, 10400, 10400, 10300, 1…
-    ## $ mu    <dbl> 0.321, 0.329, 0.310, 0.323, 0.331, 0.323, 0.329, 0.318, 0.322, 0…
+    ## # A tibble: 1 × 1
+    ##   alloy  
+    ##   <chr>  
+    ## 1 al_24st
 
 ``` r
 df_stang_long %>%
@@ -290,7 +287,7 @@ df_stang_long %>%
 - What angles were tested?
   - 0, 45, 90
 - What thicknesses were tested?
-  - 0.22, 0.32, 0.64, 0.81
+  - 0.022, 0.032, 0.064, 0.081
 - How does angle relate to mu?
 
 ## Visualize
@@ -303,18 +300,25 @@ df_stang_long %>%
 ## TASK: Investigate your question from q1 here
 
 df_stang_long %>%
-  ggplot(aes(y = mu)) +
-  geom_bar() +
-  facet_wrap(~ angle)
+  ggplot(aes(x = angle, y = mu, group = angle)) +
+  geom_boxplot()
 ```
 
 ![](c03-stang-assignment_files/figure-gfm/q3-task-1.png)<!-- -->
 
+``` r
+df_stang_long %>%
+  ggplot(aes(angle, mu)) +
+  geom_point()
+```
+
+![](c03-stang-assignment_files/figure-gfm/q3-task-2.png)<!-- -->
+
 **Observations**:
 
 - there doesn’t quite seem to be a visible relationship angle angle and
-  mu. i also couldnt get boxplot to work, maybe that could have answered
-  my question.
+  mu. looking at both the box plot and scatter plot, it doesnt seem like
+  the angle influences the mu much if at all.
 
 ### **q4** Consider the following statement:
 
