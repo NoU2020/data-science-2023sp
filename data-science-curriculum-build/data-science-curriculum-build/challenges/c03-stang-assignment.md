@@ -244,6 +244,75 @@ df_stang_long %>%
     ## 1 al_24st
 
 ``` r
+df_stang_long %>% 
+  distinct(angle)
+```
+
+    ## # A tibble: 3 × 1
+    ##   angle
+    ##   <int>
+    ## 1     0
+    ## 2    45
+    ## 3    90
+
+``` r
+df_stang_long %>% 
+  distinct(thick)
+```
+
+    ## # A tibble: 4 × 1
+    ##   thick
+    ##   <dbl>
+    ## 1 0.022
+    ## 2 0.032
+    ## 3 0.064
+    ## 4 0.081
+
+``` r
+df_stang_long %>% 
+  distinct(mu)
+```
+
+    ## # A tibble: 18 × 1
+    ##       mu
+    ##    <dbl>
+    ##  1 0.321
+    ##  2 0.329
+    ##  3 0.31 
+    ##  4 0.323
+    ##  5 0.331
+    ##  6 0.318
+    ##  7 0.322
+    ##  8 0.319
+    ##  9 0.326
+    ## 10 0.33 
+    ## 11 0.327
+    ## 12 0.328
+    ## 13 0.32 
+    ## 14 0.315
+    ## 15 0.314
+    ## 16 0.312
+    ## 17 0.316
+    ## 18 0.311
+
+``` r
+df_stang_long %>% 
+  distinct(E)
+```
+
+    ## # A tibble: 8 × 1
+    ##       E
+    ##   <dbl>
+    ## 1 10600
+    ## 2 10700
+    ## 3 10500
+    ## 4 10400
+    ## 5 10300
+    ## 6 10000
+    ## 7  9900
+    ## 8 10100
+
+``` r
 df_stang_long %>%
   summarize(alloy_count = sum(alloy == "al_24st"),
             e_mean = mean(E),

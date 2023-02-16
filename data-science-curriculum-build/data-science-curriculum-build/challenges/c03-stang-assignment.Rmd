@@ -112,6 +112,19 @@ print("Very good!")
 ##
 df_stang_long %>% 
   distinct(alloy)
+
+df_stang_long %>% 
+  distinct(angle)
+
+df_stang_long %>% 
+  distinct(thick)
+
+df_stang_long %>% 
+  distinct(mu)
+
+df_stang_long %>% 
+  distinct(E)
+
 df_stang_long %>%
   summarize(alloy_count = sum(alloy == "al_24st"),
             e_mean = mean(E),
