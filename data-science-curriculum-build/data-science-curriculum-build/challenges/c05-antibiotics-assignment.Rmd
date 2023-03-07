@@ -75,6 +75,18 @@ In this visual you must show *all three* effectiveness values for *all 16 bacter
 
 ```{r q1.1}
 # WRITE YOUR CODE HERE
+df_antibiotics %>% 
+  pivot_longer(
+    names_to = "antibiotics", 
+    values_to = "resistance",
+    c("penicillin","streptomycin", "neomycin")
+    ) %>% 
+  ggplot(aes(antibiotics, resistance, color = as_factor(gram))) +
+  geom_point() +
+  facet_wrap(~bacteria) +
+  scale_y_log10() +
+  guides(x =  guide_axis(angle = 90))
+
 ```
 
 #### Visual 2 (All variables)
@@ -85,6 +97,16 @@ Note that your visual must be *qualitatively different* from *all* of your other
 
 ```{r q1.2}
 # WRITE YOUR CODE HERE
+df_antibiotics %>% 
+  pivot_longer(
+    names_to = "antibiotics", 
+    values_to = "resistance",
+    c("penicillin","streptomycin", "neomycin")
+    ) %>% 
+  ggplot(aes(antibiotics, resistance, color = as_factor(bacteria))) +
+  geom_point() +
+  scale_y_log10() +
+  guides(x =  guide_axis(angle = 90))
 ```
 
 #### Visual 3 (Some variables)
@@ -95,6 +117,17 @@ Note that your visual must be *qualitatively different* from *all* of your other
 
 ```{r q1.3}
 # WRITE YOUR CODE HERE
+df_antibiotics %>% 
+  pivot_longer(
+    names_to = "antibiotics", 
+    values_to = "resistance",
+    c("penicillin","streptomycin", "neomycin")
+    ) %>% 
+
+  ggplot(aes(bacteria, resistance, color = as_factor(antibiotics))) +
+  geom_point(aes(shape=gram)) +
+  scale_y_log10() +
+  guides(x =  guide_axis(angle = 90))
 ```
 
 #### Visual 4 (Some variables)
@@ -104,7 +137,16 @@ In this visual you may show a *subset* of the variables (`penicillin`, `streptom
 Note that your visual must be *qualitatively different* from *all* of your other visuals.
 
 ```{r q1.4}
-# WRITE YOUR CODE HERE
+df_antibiotics %>% 
+  pivot_longer(
+    names_to = "antibiotics", 
+    values_to = "resistance",
+    c("penicillin","streptomycin", "neomycin")
+    ) %>% 
+  ggplot(aes(bacteria, antibiotics, fill = resistance)) +
+  geom_tile()+
+  scale_fill_continuous(trans= "log10") +
+  guides(x =  guide_axis(angle = 90))
 ```
 
 #### Visual 5 (Some variables)
@@ -114,7 +156,16 @@ In this visual you may show a *subset* of the variables (`penicillin`, `streptom
 Note that your visual must be *qualitatively different* from *all* of your other visuals.
 
 ```{r q1.5}
-# WRITE YOUR CODE HERE
+df_antibiotics %>% 
+  pivot_longer(
+    names_to = "antibiotics", 
+    values_to = "resistance",
+    c("penicillin","streptomycin", "neomycin")
+    ) %>% 
+  ggplot(aes(antibiotics, resistance)) +
+  geom_boxplot() +
+  scale_y_log10()
+
 ```
 
 ### __q2__ Assess your visuals
@@ -131,11 +182,11 @@ There are **two questions** below; use your five visuals to help answer both Gui
 
 *Observations*
 - What is your response to the question above?
-  - (Write your response here)
+  - In general, penicillin is effective against bacteria with positive gram and fairly ineffective against bacteria with negative gram. For the positive gram bacteria, either neomycin or penicillin are usually effective(effectiveness>0.1), while steptomycin is not super effective in general for positive grams. For negative gram bacteria, penicillin in general is not super effective (effectiveness>0.1), and the neomycin and streptomycin are more effective than penicillin, but can both be ineffective (eg aerobacter aerogenes).
 - Which of your visuals above (1 through 5) is **most effective** at helping to answer this question?
-  - (Write your response here)
+  -  The first is particularly helpful for make distinction between the effectiveness between the different antibiotics on specific bacteria, while graph 2 is helpful in identifying specific trends with antibiotics and grams. 
 - Why?
-  - (Write your response here)
+  - graph 1 is essentially 16 independent graphs, so while it is hard to make comparison between individual graphs, it is helpful in identifying how the different antibiotics vary within a specific bacteria. graph 2 is a scatter plot and colored all the different bacteria differently. It is not helpful is recognizing specific bacteria because of the overlapping colors. It is helpful in recognizing general trends with grams and antibiotics.
 
 #### Guiding Question 2
 
@@ -145,11 +196,11 @@ In 1974 *Diplococcus pneumoniae* was renamed *Streptococcus pneumoniae*, and in 
 
 *Observations*
 - What is your response to the question above?
-  - (Write your response here)
+  - It has very similar behaviors to Streptococcus family bacteria in terms of high resistance of neomycin and streptomycin but low resistance to penicillin. 
 - Which of your visuals above (1 through 5) is **most effective** at helping to answer this question?
-  - (Write your response here)
+  - Graph 3 was the most effective.
 - Why?
-  - (Write your response here)
+  - I could compare the effectiveness of each antibiotic on each bacteria with relative ease and i can reference the relative effectiveness of each antibiotic for the different bacterias. This is my favorite graph.
 
 
 # References
