@@ -78,7 +78,7 @@ That's the high-level view; now let's dig into the details.
 
 ```{r q1-task}
 ## TASK: Load the census bureau data with the following tibble name.
-df_pop <- NA
+df_pop <-  read_csv("./data/ACSDT5Y2018.B01003-Data.csv",  skip = 1, col_select = c("Id"="Geography", "Geographic Area Name", "Estimate!!Total", "Margin of Error!!Total"))
 ```
 
 *Note*: You can find information on 1-year, 3-year, and 5-year estimates [here](https://www.census.gov/programs-surveys/acs/guidance/estimates.html). The punchline is that 5-year estimates are more reliable but less current.
@@ -94,7 +94,7 @@ The New York Times is publishing up-to-date data on COVID-19 on [GitHub](https:/
 
 ```{r q2-task}
 ## TASK: Find the URL for the NYT covid-19 county-level data
-url_counties <- NA_character_
+url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"
 ```
 
 Once you have the url, the following code will download a local copy of the data, then load the data into R.
@@ -135,7 +135,10 @@ To join these datasets, we'll need to use [FIPS county codes](https://en.wikiped
 
 ```{r q3-task}
 ## TASK: Create a `fips` column by extracting the county code
-df_q3 <- NA
+df_q3 <-
+  df_pop %>% mutate(
+    fips = str_sub(Id, 10, 14)
+  )
 ```
 
 Use the following test to check your answer.
@@ -155,7 +158,8 @@ print("Very good!")
 
 ```{r q4-task}
 ## TASK: Join df_covid and df_q3 by fips.
-df_q4 <- NA
+df_q4 <- df_covid %>% 
+  left_join(df_q3, by = "fips")
 ```
 
 For convenience, I down-select some columns and produce more convenient column
@@ -189,7 +193,12 @@ Now that we've done the hard work of loading and wrangling the data, we can fina
 ```{r q5-task}
 ## TASK: Normalize cases and deaths
 df_normalized <-
-  df_data
+  df_data %>% 
+  mutate(
+    cases_per100k = cases/population*100000,
+    deaths_per100k = deaths/population*100000,
+  ) %>% 
+  na.omit()
 ```
 
 You may use the following test to check your work.
@@ -237,19 +246,36 @@ Before turning you loose, let's complete a couple guided EDA tasks.
 
 ```{r q6-task}
 ## TASK: Compute mean and sd for cases_per100k and deaths_per100k
+
+
+df_normalized %>%
+  summarise(
+            mean_cases = mean(cases_per100k),
+            std_cases = sd(cases_per100k),
+
+            mean_deaths = mean(deaths_per100k),
+            std_deaths = sd(deaths_per100k)
+            )
 ```
 
 ### __q7__ Find the top 10 counties in terms of `cases_per100k`, and the top 10 in terms of `deaths_per100k`. Report the population of each county along with the per-100,000 counts. Compare the counts against the mean values you found in q6. Note any observations.
 
 ```{r q7-task}
 ## TASK: Find the top 10 max cases_per100k counties; report populations as well
-
+df_normalized %>% 
+  arrange(desc(cases_per100k)) %>%
+  distinct(county, .keep_all = TRUE) %>%
+  head(10)
 ## TASK: Find the top 10 deaths_per100k counties; report populations as well
+df_normalized %>% 
+  arrange(desc(deaths_per100k)) %>%
+  distinct(county, .keep_all = TRUE) %>%
+  head(10)
 ```
 
 **Observations**:
 
-- (Note your observations here!)
+- The cases per 100k for Loving, Texas exceeded 100k, which meant either the reporting is incorrect or multiple ppl got better and re-contracted covid. Only Loving appeared in both top 10 cases and deaths, wich could be due to their especially small sample size of 102 population. They are also generally southern republican states. The maximum cases sky generlly clustered near 2022-05-11 until 2022-05-13, while the maximum deaths generally happened from 2022-02 until 2022-05. They all tend to have a small sample size of under 20k population per county.
 
 ## Self-directed EDA
 <!-- ------------------------- -->
@@ -267,6 +293,24 @@ Before turning you loose, let's complete a couple guided EDA tasks.
 - Your own idea!
 
 **DO YOUR OWN ANALYSIS HERE**
+```{r}
+df_normalized %>%
+  arrange(desc(deaths_per100k)) %>%
+  distinct(county, .keep_all = TRUE) %>%
+  ggplot(
+    aes(population, deaths/cases)
+  ) +
+  geom_point() +
+  geom_hline(yintercept = mean(df_normalized$deaths/df_normalized$cases))+
+  scale_y_log10()+
+  theme_minimal() +
+  labs(
+    x = "Population",
+    y = "Death per Case (per 100,000 persons)"
+  )
+```
+Observation:
+Generally the death percentage after contracting the virus ranges between 0.15 to 0.001 percent, with the average around 0.025 percent. The larger the population, the more it leans towards 0.02. There is a lot of variation with smaller population sizes, which is to be expected as they are more prone to extreme cases. 
 
 ### Aside: Some visualization tricks
 <!-- ------------------------- -->
@@ -282,7 +326,7 @@ df_normalized %>%
     aes(date, cases_per100k, color = fct_reorder2(county, date, cases_per100k))
   ) +
   geom_line() +
-  scale_y_log10(labels = scales::label_number_si()) +
+  scale_y_log10(labels = scales::label_number()) +
   scale_color_discrete(name = "County") +
   theme_minimal() +
   labs(
