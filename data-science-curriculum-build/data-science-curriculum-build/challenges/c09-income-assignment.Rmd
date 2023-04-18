@@ -349,6 +349,79 @@ df_data2 %>%
     y = "Median Household Income"
   )
 ```
+```{r}
+df_nonfamily <- df_income %>%
+  select(
+    Geography,
+    contains("Geographic"),
+    contains("median") & matches("Nonfamily households") & !contains("Annotation of")
+  ) %>%
+  mutate(across(contains("median"), as.numeric)) %>%
+  glimpse()
+
+```
+
+
+```{r}
+df_interim_male <- df_nonfamily %>%
+    pivot_longer(
+    names_pattern = "(Estimate|Margin of Error).*(Male householder.*)",
+    names_to = c(".value", "category"),
+    cols = -c("Geography", "Geographic Area Name")
+  ) %>%
+  rename(
+    "income_estimate" = "Estimate",
+    "income_moe" =  "Margin of Error"
+  ) %>%
+  mutate(
+    income_SE = income_moe/1.645,
+    income_lo = income_estimate - income_SE*2.576,
+    income_hi = income_estimate + income_SE*2.576,
+    income_CV = income_SE/income_estimate
+  )%>% 
+  na.omit(df_interim_male)
+```
+
+
+```{r}
+df_interim_female <- df_nonfamily %>%
+    pivot_longer(
+    names_pattern = "(Estimate|Margin of Error).*(Female householder.*)",
+    names_to = c(".value", "category"),
+    cols = -c("Geography", "Geographic Area Name")
+  ) %>%
+  rename(
+    "income_estimate" = "Estimate",
+    "income_moe" =  "Margin of Error"
+  ) %>%
+  mutate(
+    income_SE = income_moe/1.645,
+    income_lo = income_estimate - income_SE*2.576,
+    income_hi = income_estimate + income_SE*2.576,
+    income_CV = income_SE/income_estimate
+  )%>% 
+  na.omit(df_interim_female)
+
+```
+
+```{r}
+df_interim <- bind_rows(df_interim_male, df_interim_female) %>% 
+  arrange(Geography)
+
+```
+
+
+```{r}
+df_ppt <- right_join(df_pop, df_interim, by = c("Geography", "Geographic Area Name"))
+
+df_ppt
+
+df_ppt %>%
+  ggplot(aes(x = category, y = income_estimate, group = category)) +
+  geom_boxplot()  +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
 
 **Observations**:
 
