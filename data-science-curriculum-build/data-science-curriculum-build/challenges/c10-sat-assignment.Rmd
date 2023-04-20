@@ -57,9 +57,9 @@ All the deliverables stated in the rubrics above are due **at midnight** before 
 
 ```{r q1-task}
 ## TODO:
-df_sat <- NA
-
+df_sat <- read_excel("./data/sat.xls")
 ## TODO: Do your "first checks"
+df_sat %>% glimpse()
 ```
 
 **Observations**:
@@ -68,18 +68,18 @@ df_sat <- NA
 
 | Column     | Meaning |
 |------------|---------|
-| `high_GPA` | ???     |
-| `math_SAT` | ???     |
-| `verb_SAT` | ???     |
-| `comp_GPA` | ???     |
-| `univ_GPA` | ???     |
+| `high_GPA` | High school grade point average   |
+| `math_SAT` | Math SAT score     |
+| `verb_SAT` | Verbal SAT score     |
+| `comp_GPA` | Computer Science GPA     |
+| `univ_GPA` | Overall university GPA     |
 
 - What information do we have about these students?
-  - (Your response here)
+  - We know their GPA scores in both university and highschool, their specific computer science GPA, and the individual scores of their math and verbal sections. Based on the description of the data from the authors, we also know that this study examines the SAT and GPA information of 105 students who graduated from a state university with a B.S. in computer science. 
 - What kinds of information *do we not have* about these students?
-  - (Your response here)
+  - Their upbringing, previous exposure to practice problems before taking the test, the amount of attempts of taking the test, difficulty of their highschool classes/university classes.
 - Based on these missing variables, what possible effects could be present in the data that we would have *no way of detecting*?
-  - (Your response here)
+  - students could have taking multiple tests and gotten better scores on the SAT, students with access to practice problems or better extracirricular materials could have higher GPA and SAT scores, they could have taken easier/less challenging courses to get a higher GPA, they might have transferred into a CS major from another major, etc etc.
 
 # Analysis with Hypothesis Testing
 <!-- ----------------------------------------------------------------------- -->
@@ -104,14 +104,33 @@ df_composite <-
 
 ```{r q2-task}
 ## TODO:
+df_composite_long <- pivot_longer(df_composite, cols = c("high_GPA", "both_SAT"),
+                                  names_to = "variable", values_to = "value")
+
+
+# Create the scatter plot with a regression line
+ggplot(df_composite_long, aes(x = univ_GPA, y = value, color = variable)) +
+  geom_point() +
+  labs(x = "University GPA", y = "Both SAT score", color = "") +
+  theme_bw()
+#I dont like how its not scaled, i tried using the y_scale_continous thing but it didnt work out...
+
+#I made these plots for better observations to answer the questions
+ggplot(df_composite, aes(x = univ_GPA, y = both_SAT)) +
+  geom_point()
+
+ggplot(df_composite, aes(x = univ_GPA, y = high_GPA)) +
+  geom_point()
 ```
+
+
 
 **Observations**:
 
 - What relationship do `univ_GPA` and `both_SAT` exhibit?
-  - (Your response here)
+  - there seems to be a generally positive correlation between the two. However, once the university gpa reaches above 3.0, the SAT scores are a lot more varied.
 - What relationship do `univ_GPA` and `high_GPA` exhibit?
-  - (Your response here)
+  - it has a similar generally positive correlation between the two. the trend is a lot stronger for university gpa above 3.25
 
 ### Hypothesis Testing with a Correlation Coefficient
 <!-- ------------------------- -->
@@ -131,16 +150,22 @@ The R function `cor.test` implements such a hypothesis test under the assumption
 ### __q3__ Plot histograms for `both_SAT, high_GPA, univ_GPA`. Which---if any---of the variables look approximately normally distributed.
 
 ```{r q3-task}
+ggplot(df_composite, aes(x = both_SAT)) + geom_histogram(binwidth=50, fill = "red") + 
+  labs(title = "Histogram of both_SAT")
+ggplot(df_composite, aes(x = high_GPA)) + geom_histogram(binwidth=0.25, fill = "green") + 
+  labs(title = "Histogram of high_GPA")
+ggplot(df_composite, aes(x = univ_GPA)) + geom_histogram(binwidth=0.25,fill = "blue") + 
+  labs(title = "Histogram of univ_GPA")
 ```
 
 **Observations**:
 
 - To what extent does `both_SAT` look like a normal distribution?
-  - (Your response here)
+  - It doesn't look super like a normal distribution, there is a more distinct curve towards the 1350+ range, but the distribution before that seems pretty uniform.
 - To what extent does `high_GPA` look like a normal distribution?
-  - (Your response here)
+  - It looks pretty close to a normal distribution, other than a weird gap in the middle around 3.0.
 - To what extent does `univ_GPA` look like a normal distribution?
-  - (Your response here)
+  - It seems pretty skewed to the right and doesn't look like a normal distribution.
 
 Keep in mind your findings as you complete q4.
 
@@ -150,18 +175,28 @@ Keep in mind your findings as you complete q4.
 ## TODO: Use the function cor.test() to test the correlations between
 ##       high_GPA and univ_GPA, as well as between
 ##       both_SAT and univ_GPA
+# calculate the correlation and confidence intervals for high_GPA and univ_GPA
+cor_test_high_univ <- cor.test(df_composite$high_GPA, df_composite$univ_GPA)
+cat("Correlation between high_GPA and univ_GPA:", round(cor_test_high_univ$estimate, 2), "\n")
+cat("Confidence interval for the correlation:", round(cor_test_high_univ$conf.int, 2), "\n")
+
+# calculate the correlation and confidence intervals for both_SAT and univ_GPA
+cor_test_both_univ <- cor.test(df_composite$both_SAT, df_composite$univ_GPA)
+cat("Correlation between both_SAT and univ_GPA:", round(cor_test_both_univ$estimate, 2), "\n")
+cat("Confidence interval for the correlation:", round(cor_test_both_univ$conf.int, 2), "\n")
+
 ```
 
 **Observations**:
 
 - Which correlations are significantly nonzero?
-  - (Your response here)
+  - I would say both highschool GPA and both SAT were significantly nonzero.
 - Which of `high_GPA` and `both_SAT` seems to be more strongly correlated with `univ_GPA`?
-  - (Your response here)
+  - high_GPA has a higher correlation with a 0.1 stronger correlation.
 - How do the results here compare with the visual you created in q2?
-  - (Your response here)
+  - it is fairly consistent with the observations in q2
 - Based on these results, what can we say about the predictive capabilities of both `high_GPA` and `both_SAT` to predict `univ_GPA`?
-  - (Your response here)
+  - both are pretty predictive for university GPA. I would hesitate to say that one is distinctively better than another as the confidence intervals still overlap a good chunk.
 
 Finally, let's use the bootstrap to perform the same test using *different* assumptions.
 
@@ -169,14 +204,31 @@ Finally, let's use the bootstrap to perform the same test using *different* assu
 
 ```{r q5-task}
 ## TODO: Use the bootstrap to compute a confidence interval for corr[high_GPA, univ_GPA]
+corr_fn <- function(data, indices) {
+  cor(data[indices, "high_GPA"], data[indices, "univ_GPA"])
+}
+
+# set the random seed for reproducibility
+set.seed(123)
+
+# perform the bootstrap
+n_bootstrap <- 1000
+bootstrap_corr <- replicate(n_bootstrap, corr_fn(df_composite, sample(nrow(df_composite), nrow(df_composite), replace = TRUE)))
+
+# calculate the confidence interval
+bootstrap_ci <- quantile(bootstrap_corr, c(0.025, 0.975))
+
+# print the results
+cat("Bootstrap estimate of correlation:", round(mean(bootstrap_corr), 2), "\n")
+cat("Bootstrap confidence interval:", round(bootstrap_ci, 2))
 ```
 
 **Observations**:
 
 - How does your estimate from q5 compare with your estimate from q4?
-  - (Your response here)
+  - Its the same estimate
 - How does your CI from q5 compare with your CI from q4?
-  - (Your response here)
+  - It is basically the same as th q4 estimate, with a slightly higher high confidence level.
 
 *Aside*: When you use two different approximations to compute the same quantity and get similar results, that's an *encouraging sign*. Such an outcome lends a bit more credibility to the results.
 
@@ -225,7 +277,10 @@ In this case, we're testing for whether $X$ has a significant effect on $Y$. Let
 
 ```{r q6-task}
 ## TODO: Fit a model of univ_GPA on the predictor both_SAT
-fit_basic <- NA
+fit_basic <- lm(univ_GPA ~ both_SAT, data = df_composite)
+
+## Assess the model
+summary(fit_basic)
 
 ## NOTE: The following computes confidence intervals on regression coefficients
 fit_basic %>%
@@ -238,9 +293,9 @@ fit_basic %>%
 **Observations**:
 
 - What is the confidence interval on the coefficient of `both_SAT`? Is this coefficient significantly different from zero?
-  - (Your response here)
+  - 0.00198 to 0.00349
 - By itself, how well does `both_SAT` predict `univ_GPA`?
-  - (Your response here)
+  - by itself a 100 increase in sat means roughly a 0.2 increase in GPA, which is not insignificant, but not a good enough indicator of GPA. The r squared value is less thahn 0.5, which means it is pretty weak.
 
 Remember from `e-model03-interp-warnings` that there are challenges with interpreting regression coefficients! Let's investigate that idea further.
 
@@ -248,16 +303,38 @@ Remember from `e-model03-interp-warnings` that there are challenges with interpr
 
 ```{r q7-task}
 ## TODO: Fit and assess models with predictors both_SAT + high_GPA, and high_GPA alone
+fit_both <- lm(univ_GPA ~ high_GPA + both_SAT, data = df_composite)
+
+## Assess the model
+summary(fit_both)
+
+fit_both %>%
+  tidy(
+    conf.int = TRUE,
+    conf.level = 0.99
+  )
+
+## Fit the model with high_GPA only
+fit_high <- lm(univ_GPA ~ high_GPA, data = df_composite)
+
+## Assess the model
+summary(fit_high)
+
+fit_high %>%
+  tidy(
+    conf.int = TRUE,
+    conf.level = 0.99
+  )
 ```
 
 **Observations**:
 
 - How well do these models perform, compared to the one you built in q6?
-  - (Your response here)
+  - in terms of predictability, it is not drastically different, but both models out performed the q6 model by at least 0.1 r2.
 - What is the confidence interval on the coefficient of `both_SAT` when including `high_GPA` as a predictor?? Is this coefficient significantly different from zero?
-  - (Your response here)
+  - The confidence interval is around [-0.00022, 0.0018].It is not significantly different from 0, in fact it is very close to 0. 
 - How do the hypothesis test results compare with the results in q6?
-  - (Your response here)
+  - The hypothesis test results are similar, though even just high_GPA on its own is a more accurate prediction than the SAT scores.
 
 ## Synthesize
 <!-- ------------------------- -->
@@ -269,9 +346,9 @@ Before closing, let's synthesize a bit from the analyses above.
 **Observations**:
 
 - Between `both_SAT` and `high_GPA`, which single variable would you choose to predict `univ_GPA`? Why?
-  - (Your response here)
+  - I would choose high_GPA because it just outperforms both_SAT in this specific scenario. However, it doesnt necessarily mean that it should be a global prediction method, as it is just a measurement shown to be slightly effective in this specific state university for cs majors.
 - Is `both_SAT` an effective predictor of `univ_GPA`? What specific pieces of evidence do you have in favor of `both_SAT` being effective? What specific pieces of evidence do you have against?
-  - (Your response here)
+  -both_SAT follows a roughly normal distribution, and has a R2 value that is significantly non-zero. However, in this specific dataset, the mean prediction of highschool GPA is more predictive. It is also worth noting that the confidence interval for most measurements between the 2 variables has some overlap with each other.
 
 # End Notes
 <!-- ----------------------------------------------------------------------- -->
