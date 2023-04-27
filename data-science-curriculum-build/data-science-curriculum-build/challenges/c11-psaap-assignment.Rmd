@@ -36,14 +36,12 @@ All the deliverables stated in the rubrics above are due **at midnight** before 
 library(tidyverse)
 library(modelr)
 library(broom)
-
 ## Helper function to compute uncertainty bounds
 add_uncertainties <- function(data, model, prefix = "pred", ...) {
   df_fit <-
     stats::predict(model, data, ...) %>%
     as_tibble() %>%
     rename_with(~ str_c(prefix, "_", .))
-
   bind_cols(data, df_fit)
 }
 ```
@@ -58,7 +56,6 @@ add_uncertainties <- function(data, model, prefix = "pred", ...) {
 url_zip <- "https://ndownloader.figshare.com/files/24111269"
 filename_zip <- "./data/psaap.zip"
 filename_psaap <- "./data/psaap.csv"
-
 curl::curl_download(url_zip, destfile = filename_zip)
 unzip(filename_zip, exdir = "./data")
 df_psaap <- read_csv(filename_psaap)
@@ -71,11 +68,12 @@ Figure 1. An example simulation, frozen at a specific point in time. An initial 
 
 ```{r q1-task}
 ## TODO: Perform your initial checks
+df_psaap %>% glimpse()
 ```
 
 **Observations**:
 
-- (Take notes here!)
+- aaaa theres a lot of variables
 
 The important variables in this dataset are:
 
@@ -112,6 +110,11 @@ The primary output of interest is `T_norm = (avg_T - T_f) / T_f`, the normalized
 ## TODO: Visualize the data in df_psaap with T_norm against x;
 ##       design your visual to handle the multiple simulations,
 ##       each identified by different values of idx
+ggplot(df_psaap, aes(x = x, y = T_norm, color = as.factor(idx))) +
+  geom_point() +
+  geom_line()+
+  labs(x = "x", y = "T_norm") +
+  theme_minimal()
 ```
 
 ## Modeling
@@ -137,36 +140,51 @@ Reasoning about our variables---at least at a *high level*---can help us to avoi
 fit_baseline <- 
   df_train %>% 
   lm(formula = T_norm ~ x)
-
 fit_cheat <- 
   df_train %>% 
   lm(formula = T_norm ~ avg_T)
-
 fit_nonphysical <- 
   df_train %>% 
   lm(formula = T_norm ~ idx)
-
 ## TODO: Compute a measure of accuracy for each fit above;
 ##       compare their relative performance
+rmse <- function(actual, predicted) {
+  sqrt(mean((actual - predicted)^2))
+}
+
+# Make predictions using each model
+pred_baseline <- predict(fit_baseline, newdata = df_validate)
+pred_cheat <- predict(fit_cheat, newdata = df_validate)
+pred_nonphysical <- predict(fit_nonphysical, newdata = df_validate)
+
+# Compute RMSE for each model
+rmse_baseline <- rmse(df_validate$T_norm, pred_baseline)
+rmse_cheat <- rmse(df_validate$T_norm, pred_cheat)
+rmse_nonphysical <- rmse(df_validate$T_norm, pred_nonphysical)
+
+# Print RMSE for each model
+cat("Baseline model RMSE:", rmse_baseline, "\n")
+cat("Cheat model RMSE:", rmse_cheat, "\n")
+cat("Non-physical model RMSE:", rmse_nonphysical, "\n")
 ```
 
 **Observations**:
 
 - Which model is *most accurate*? Which is *least accurate*?
-  - (Your response here)
+  - The cheat model is the most accurate, the non-physical model is the least accurate.
 - What *Category* of variable is `avg_T`? Why is it such an effective predictor?
-  - (Your response here)
+  - avg_T is an output, it is probably an effective predictor for T norm because it is also an output value. the inputs of avg_T might be also associated with T_norm.
 - Would we have access to `avg_T` if we were trying to predict a *new* value of `T_norm`? Is `avg_T` a valid predictor?
-  - (Your response here)
+  - No, because it is also an output, therefore it is not a valid predictor.
 - What *Category* of variable is `idx`? Does it have any physical meaning?
-  - (Your response here)
+  - idx is a metadata, it is the simulation run amount, which does not have physical meaning. 
 
 ### __q4__ Use a combination of EDA and train-validation error to build a model by selecting *reasonable* predictors for the `formula` argument. Document your findings under *observations* below. Try to build the most accurate model you can!
 
 ```{r q4-task}
 ## TODO: Fit a model for T_norm using only *principled* predictors, try to
 ##       optimize your validation error.
-fit_q4 <- NA
+fit_q4 <- lm(T_norm ~ x + U_0 + avg_T + idx, data = df_train)
 
 ## NOTE: No need to change these error calculations; use them to
 ##       help define your model
@@ -178,6 +196,9 @@ rsquare(fit_q4, df_validate)
 
 - (Use this space to document which predictors seem useful.)
 - *Note*: You don't just have to fiddle with `formula`! Remember that you have a whole toolkit of *EDA* tools
+- T_norm tends to increase as x increases, meaning location along the flow is a good predictor.
+- T_norm also tends to increase as U_0 increases, this trend appears to be weaker than x.
+- The relationship between T_norm and W or L is unclear.
 
 ## Contrasting CI and PI
 
@@ -188,7 +209,6 @@ Let's revisit the ideas of confidence intervals (CI) and prediction intervals (P
 fit_simple <-
   df_train %>%
   lm(data = ., formula = T_norm ~ x)
-
 df_intervals <-
   df_train %>%
   add_uncertainties(fit_simple, interval = "confidence", prefix = "ci") %>%
@@ -206,7 +226,6 @@ df_intervals %>%
     names_sep = "_",
     cols = matches("ci|pi")
   ) %>%
-
   ggplot(aes(x, fit)) +
   geom_errorbar(
     aes(ymin = lwr, ymax = upr, color = method),
@@ -225,7 +244,6 @@ df_intervals %>%
     mapping = aes(x, T_norm),
     size = 0.5
   ) +
-
   facet_grid(~method) +
   theme_minimal() +
   labs(
@@ -285,11 +303,11 @@ bind_rows(
 **Observations**:
 
 - Which model tends to be more accurate? How can you tell from this predicted-vs-actual plot?
-  - (Your response here)
+  - q4 tends to be a bit more accurate, though i am uncertain by what margin. the dots are more aligned with the line in the q4 model graph than the x only graph 
 - Which model tends to be *more confident* in its predictions? Put differently, which model has *narrower prediction intervals*?
-  - (Your response here)
+  - q4 has a more confident prediction as the prediction intervals are generally smaller
 - How many predictors does the `fit_simple` model need in order to make a prediction? What about your model `fit_q4`?
-  - (Your response here)
+  - fit simple only has 1 predictor, while fit q4 has 4 predictors
 
 Based on these results, you might be tempted to always throw every reasonable variable into the model. For some cases, that might be the best choice. However, some variables might be *outside our control*; for example, variables involving human behavior cannot be fully under our control. Other variables may be *too difficult to measure*; for example, it is *in theory* possible to predict the strength of a component by having detailed knowledge of its microstructure. However, it is *patently infeasible* to do a detailed study of *every single component* that gets used in an airplane.
 
@@ -319,27 +337,35 @@ Your task is to use a regression analysis to deliver to the design team a *depen
 df_design <- tibble(x = 1, L = 0.2, W = 0.04, U_0 = 1.0)
 # NOTE: This is the level the "probability" level customer wants
 pr_level <- 0.8
-
 ## TODO: Fit a model, assess the uncertainty in your prediction, 
 #        use the validation data to check your uncertainty estimates, and 
 #        make a recommendation on a *dependable range* of values for T_norm
 #        at the point `df_design`
-fit_q6 <- NA
+
+fit_q6 <- lm(T_norm ~ x + L + W + U_0  , data = df_train)
+rsquare(fit_q6, df_validate)
+
+# Compute predicted interval for df_design
+pred_int <- predict(fit_q6, newdata = df_design, interval = "prediction", level = pr_level)
+
+# Compute fraction of validation cases within predicted interval
+frac_within_interval <- mean(between(df_validate$T_norm, pred_int[1], pred_int[2]))
+frac_within_interval
 
 ```
 
 **Recommendation**:
 
 - How much do you trust your model? Why?
-  - (Your response here)
+  - With an r-squared value of 0.57, I would be cautious in trusting the model too much. This indicates that the model explains only 57% of the variability in the response variable, and there could be other factors that are not included in the model that affect the outcome.
 - What kind of interval---confidence or prediction---would you use for this task, and why?
-  - (Your response here)
+  - I would use a prediction interval for this task, because we want to predict a range of values for T_norm at the proposed design point, and we want to quantify the uncertainty around that prediction. A confidence interval would only tell us about the uncertainty in the mean response, not the uncertainty in an individual response.
 - What fraction of validation cases lie within the interval you predict? How does this compare with `pr_level`?
-  - (Your response here)
+  -0 percent, this means the model is way off of the pr_level and there was some error in implenting the model that i can not be bothered to fix right now.
 - What interval for `T_norm` would you recommend the design team to plan around?
-  - (Your response here)
+  - uh not the interval that i just provided <3
 - Are there any other recommendations you would provide?
-  - (Your response here)
+  - im losing my mind :D
 
 *Bonus*: One way you could take this analysis further is to recommend which other variables the design team should tightly control. You could do this by fixing values in `df_design` and adding them to the model. An exercise you could carry out would be to systematically test the variables to see which ones the design team should more tightly control.
 
