@@ -629,7 +629,15 @@ frac_within_interval
   around?
   - uh not the interval that i just provided \<3
 - Are there any other recommendations you would provide?
-  - im losing my mind :D
+  - Unfortunately, the fraction of validation cases within the predicted
+    interval is 0%, which suggests that the model is not accurately
+    predicting the response variable for the validation data. This could
+    be due to a variety of reasons, such as not including all relevant
+    predictors or having insufficient data to model the relationship.
+    Therefore, it may not be appropriate to rely solely on this model to
+    make recommendations for the design team. Further analysis and model
+    refinement may be necessary to improve the accuracy of the
+    predictions.
 
 *Bonus*: One way you could take this analysis further is to recommend
 which other variables the design team should tightly control. You could
