@@ -186,8 +186,10 @@ df_antibiotics %>%
     values_to = "resistance",
     c("penicillin","streptomycin", "neomycin")
     ) %>% 
-  ggplot(aes(antibiotics, resistance, color = as_factor(bacteria))) +
-  geom_point() +
+  ggplot(aes(as_factor(bacteria), resistance, color = antibiotics)) +
+  
+  geom_point(mapping = aes(shape = as_factor(gram)),
+    size = 3) +
   scale_y_log10() +
   guides(x =  guide_axis(angle = 90))
 ```
@@ -316,15 +318,16 @@ and in 1984 *Streptococcus fecalis* was renamed *Enterococcus fecalis*
 > Why was *Diplococcus pneumoniae* was renamed *Streptococcus
 > pneumoniae*?
 
-*Observations* - What is your response to the question above? - It has
-very similar behaviors to Streptococcus family bacteria in terms of high
-resistance of neomycin and streptomycin but low resistance to
-penicillin. - Which of your visuals above (1 through 5) is **most
-effective** at helping to answer this question? - Graph 3 was the most
-effective. - Why? - I could compare the effectiveness of each antibiotic
-on each bacteria with relative ease and i can reference the relative
-effectiveness of each antibiotic for the different bacterias. This is my
-favorite graph.
+*Observations* - What is your response to the question above? - Given
+that relationship between MIC and biological structure, similar MIC
+values across bacteria might relate to similar biological structure,
+hence renaming the bacteria based on previously unobserved biological
+structure via antibiotic resistances might be a possibility - Which of
+your visuals above (1 through 5) is **most effective** at helping to
+answer this question? - Graph 3 was the most effective. - Why? - I could
+compare the effectiveness of each antibiotic on each bacteria with
+relative ease and i can reference the relative effectiveness of each
+antibiotic for the different bacterias. This is my favorite graph.
 
 # References
 
