@@ -108,6 +108,8 @@ match_prop <- sum(diag(cont_table)) / sum(cont_table)
 ## Print the proportion
 match_prop
 
+df_data %>% group_by(subject_race) %>% count(subject_race == str_to_lower(raw_Race)) 
+
 ```
 
 **Observations**
@@ -119,7 +121,7 @@ Between the two hypotheses:
 
 which is most plausible, based on your results?
 
-- I think its more plausible that race_Raw refers to the race of the police officer, especially since race_Raw has a category of "None - no operators present, citations only". (I'm not really using the data from q4 because i think the captializations are different and it impacted the result)
+- Based on the results, it seems more plausible that race_Raw is an unprocessed version of subject_race. This is because there are only three unique values in race_Raw (White, Black, and Hispanic), which correspond exactly to the three values in subject_race that are marked as TRUE (Black, Hispanic, and White). If race_Raw were truly the race of the police officer, we would expect to see a much wider variety of values in that column, rather than just three.
 
 ## Vis
 <!-- ------------------------- -->
@@ -215,9 +217,11 @@ By default `glm` uses the first factor level present as the reference level. The
 ```{r q7-task}
 ## TODO: Re-fit the logistic regression, but set "white" as the reference
 ## level for subject_race
-## Refit the logistic regression with "white" as the reference level for subject_race
-fit_q7 <- glm(arrest_made ~ subject_race %>% fct_relevel("white") + subject_sex + subject_age, data = df_data, family = "binomial")
-fit_q7 %>% tidy()
+## Refit the logistic regression with "white" as the reference level for subject_rac
+  
+
+fit_q7 <- glm(arrest_made ~ subject_race + subject_sex + subject_age, data = df_data, family = "binomial")
+fit_q7 %>% tidy() %>% mutate(fct_relevel("white"))
 ## Print the summary of the fitted model
 summary(fit_q7)
 
@@ -231,7 +235,7 @@ summary(fit_q7)
 - What could explain this difference in probabilities of arrest across race? List **multiple** possibilities.
   - well people could be predisposed to react to a certain race a certain way (aka racist), they could also have different base numbers, for example there might be less other races than white or smth, certain races might also be more or less prevalent with vehicle related professions.
 - Look at the sent of variables in the dataset; do any of the columns relate to a potential explanation you listed?
-  - females, age, hispanic and asian/pacific islander all have a p value of 0.
+  - being black, hispanic, of unknown race or a female all seem to have impact on one's chances of getting arrested.
 
 One way we can explain differential arrest rates is to include some measure indicating the presence of an arrestable offense. We'll do this in a particular way in the next task.
 
@@ -268,12 +272,18 @@ search_summary <-df_data %>%
 ## Print the bar plot
 search_summary
 
+fit_q9 <- glm(arrest_made ~ subject_race + subject_sex + contraband_drugs, data = df_data, family = "binomial")
+fit_q9 %>% tidy()
+## Print the summary of the fitted model
+summary(fit_q9)
+
 ```
 
 
 **Observations**:
 
 - A very odd observation that the other section is so much higher than probable cause (~4 times as high), which might give us some insight to the reasons for searching are often not justified by an observation, but potentially implicit bias
+- this fit model shows than being hispanic almost has the same impact on u getting arrested as having drugs.
 
 ## Further Reading
 <!-- -------------------------------------------------- -->

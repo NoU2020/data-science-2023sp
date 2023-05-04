@@ -230,6 +230,22 @@ match_prop
 
     ## [1] 0
 
+``` r
+df_data %>% group_by(subject_race) %>% count(subject_race == str_to_lower(raw_Race)) 
+```
+
+    ## # A tibble: 7 × 3
+    ## # Groups:   subject_race [7]
+    ##   subject_race           `subject_race == str_to_lower(raw_Race)`       n
+    ##   <fct>                  <lgl>                                      <int>
+    ## 1 asian/pacific islander FALSE                                     166842
+    ## 2 black                  TRUE                                      351610
+    ## 3 hispanic               TRUE                                      338317
+    ## 4 white                  TRUE                                     2529780
+    ## 5 other                  FALSE                                      11008
+    ## 6 unknown                FALSE                                      17017
+    ## 7 <NA>                   NA                                          1664
+
 **Observations**
 
 Between the two hypotheses:
@@ -239,11 +255,13 @@ Between the two hypotheses:
 
 which is most plausible, based on your results?
 
-- I think its more plausible that race_Raw refers to the race of the
-  police officer, especially since race_Raw has a category of “None - no
-  operators present, citations only”. (I’m not really using the data
-  from q4 because i think the captializations are different and it
-  impacted the result)
+- Based on the results, it seems more plausible that race_Raw is an
+  unprocessed version of subject_race. This is because there are only
+  three unique values in race_Raw (White, Black, and Hispanic), which
+  correspond exactly to the three values in subject_race that are marked
+  as TRUE (Black, Hispanic, and White). If race_Raw were truly the race
+  of the police officer, we would expect to see a much wider variety of
+  values in that column, rather than just three.
 
 ## Vis
 
@@ -379,23 +397,25 @@ level. Therefore we can use
 ``` r
 ## TODO: Re-fit the logistic regression, but set "white" as the reference
 ## level for subject_race
-## Refit the logistic regression with "white" as the reference level for subject_race
-fit_q7 <- glm(arrest_made ~ subject_race %>% fct_relevel("white") + subject_sex + subject_age, data = df_data, family = "binomial")
-fit_q7 %>% tidy()
+## Refit the logistic regression with "white" as the reference level for subject_rac
+  
+
+fit_q7 <- glm(arrest_made ~ subject_race + subject_sex + subject_age, data = df_data, family = "binomial")
+fit_q7 %>% tidy() %>% mutate(fct_relevel("white"))
 ```
 
-    ## # A tibble: 8 × 5
-    ##   term                                        estim…¹ std.e…² statis…³   p.value
-    ##   <chr>                                         <dbl>   <dbl>    <dbl>     <dbl>
-    ## 1 "(Intercept)"                               -3.04   1.08e-2 -282.    0        
-    ## 2 "subject_race %>% fct_relevel(\"white\")as… -0.389  2.00e-2  -19.4   7.72e- 84
-    ## 3 "subject_race %>% fct_relevel(\"white\")bl…  0.379  1.03e-2   36.9   7.64e-299
-    ## 4 "subject_race %>% fct_relevel(\"white\")hi…  0.892  8.59e-3  104.    0        
-    ## 5 "subject_race %>% fct_relevel(\"white\")ot… -0.0246 6.83e-2   -0.360 7.18e-  1
-    ## 6 "subject_race %>% fct_relevel(\"white\")un… -1.94   3.15e-1   -6.15  7.82e- 10
-    ## 7 "subject_sexfemale"                         -0.751  8.96e-3  -83.8   0        
-    ## 8 "subject_age"                               -0.0144 2.77e-4  -52.0   0        
-    ## # … with abbreviated variable names ¹​estimate, ²​std.error, ³​statistic
+    ## # A tibble: 8 × 6
+    ##   term                 estimate std.error statistic   p.value fct_relevel("whi…¹
+    ##   <chr>                   <dbl>     <dbl>     <dbl>     <dbl> <fct>             
+    ## 1 (Intercept)           -3.43    0.0217     -158.   0         white             
+    ## 2 subject_raceblack      0.768   0.0217       35.5  1.25e-275 white             
+    ## 3 subject_racehispanic   1.28    0.0209       61.3  0         white             
+    ## 4 subject_racewhite      0.389   0.0200       19.4  7.72e- 84 white             
+    ## 5 subject_raceother      0.364   0.0709        5.14 2.81e-  7 white             
+    ## 6 subject_raceunknown   -1.55    0.315        -4.91 9.33e-  7 white             
+    ## 7 subject_sexfemale     -0.751   0.00896     -83.8  0         white             
+    ## 8 subject_age           -0.0144  0.000277    -52.0  0         white             
+    ## # … with abbreviated variable name ¹​`fct_relevel("white")`
 
 ``` r
 ## Print the summary of the fitted model
@@ -404,41 +424,23 @@ summary(fit_q7)
 
     ## 
     ## Call:
-    ## glm(formula = arrest_made ~ subject_race %>% fct_relevel("white") + 
-    ##     subject_sex + subject_age, family = "binomial", data = df_data)
+    ## glm(formula = arrest_made ~ subject_race + subject_sex + subject_age, 
+    ##     family = "binomial", data = df_data)
     ## 
     ## Deviance Residuals: 
     ##     Min       1Q   Median       3Q      Max  
     ## -0.4384  -0.2578  -0.2221  -0.1792   3.6590  
     ## 
     ## Coefficients:
-    ##                                                               Estimate
-    ## (Intercept)                                                 -3.0424225
-    ## subject_race %>% fct_relevel("white")asian/pacific islander -0.3885906
-    ## subject_race %>% fct_relevel("white")black                   0.3794557
-    ## subject_race %>% fct_relevel("white")hispanic                0.8920971
-    ## subject_race %>% fct_relevel("white")other                  -0.0246057
-    ## subject_race %>% fct_relevel("white")unknown                -1.9358983
-    ## subject_sexfemale                                           -0.7507356
-    ## subject_age                                                 -0.0143870
-    ##                                                             Std. Error  z value
-    ## (Intercept)                                                  0.0107922 -281.909
-    ## subject_race %>% fct_relevel("white")asian/pacific islander  0.0200305  -19.400
-    ## subject_race %>% fct_relevel("white")black                   0.0102698   36.949
-    ## subject_race %>% fct_relevel("white")hispanic                0.0085900  103.853
-    ## subject_race %>% fct_relevel("white")other                   0.0682575   -0.360
-    ## subject_race %>% fct_relevel("white")unknown                 0.3148556   -6.149
-    ## subject_sexfemale                                            0.0089580  -83.806
-    ## subject_age                                                  0.0002768  -51.985
-    ##                                                             Pr(>|z|)    
-    ## (Intercept)                                                  < 2e-16 ***
-    ## subject_race %>% fct_relevel("white")asian/pacific islander  < 2e-16 ***
-    ## subject_race %>% fct_relevel("white")black                   < 2e-16 ***
-    ## subject_race %>% fct_relevel("white")hispanic                < 2e-16 ***
-    ## subject_race %>% fct_relevel("white")other                     0.718    
-    ## subject_race %>% fct_relevel("white")unknown                7.82e-10 ***
-    ## subject_sexfemale                                            < 2e-16 ***
-    ## subject_age                                                  < 2e-16 ***
+    ##                        Estimate Std. Error  z value Pr(>|z|)    
+    ## (Intercept)          -3.4310131  0.0217352 -157.855  < 2e-16 ***
+    ## subject_raceblack     0.7680464  0.0216511   35.474  < 2e-16 ***
+    ## subject_racehispanic  1.2806877  0.0208936   61.296  < 2e-16 ***
+    ## subject_racewhite     0.3885906  0.0200305   19.400  < 2e-16 ***
+    ## subject_raceother     0.3639849  0.0708738    5.136 2.81e-07 ***
+    ## subject_raceunknown  -1.5473077  0.3154343   -4.905 9.33e-07 ***
+    ## subject_sexfemale    -0.7507356  0.0089580  -83.806  < 2e-16 ***
+    ## subject_age          -0.0143870  0.0002768  -51.985  < 2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -467,8 +469,8 @@ summary(fit_q7)
     vehicle related professions.
 - Look at the sent of variables in the dataset; do any of the columns
   relate to a potential explanation you listed?
-  - females, age, hispanic and asian/pacific islander all have a p value
-    of 0.
+  - being black, hispanic, of unknown race or a female all seem to have
+    impact on one’s chances of getting arrested.
 
 One way we can explain differential arrest rates is to include some
 measure indicating the presence of an arrestable offense. We’ll do this
@@ -562,12 +564,67 @@ search_summary
 
 ![](c12-policing-assignment_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
+``` r
+fit_q9 <- glm(arrest_made ~ subject_race + subject_sex + contraband_drugs, data = df_data, family = "binomial")
+fit_q9 %>% tidy()
+```
+
+    ## # A tibble: 8 × 5
+    ##   term                  estimate std.error statistic  p.value
+    ##   <chr>                    <dbl>     <dbl>     <dbl>    <dbl>
+    ## 1 (Intercept)           -0.916      0.0565   -16.2   4.05e-59
+    ## 2 subject_raceblack      0.00994    0.0611     0.163 8.71e- 1
+    ## 3 subject_racehispanic   0.268      0.0597     4.49  7.25e- 6
+    ## 4 subject_racewhite      0.0989     0.0575     1.72  8.55e- 2
+    ## 5 subject_raceother     -0.0513     0.145     -0.354 7.23e- 1
+    ## 6 subject_raceunknown  -10.6       50.5       -0.209 8.35e- 1
+    ## 7 subject_sexfemale     -0.325      0.0250   -13.0   8.65e-39
+    ## 8 contraband_drugsTRUE   0.353      0.0189    18.7   2.55e-78
+
+``` r
+## Print the summary of the fitted model
+summary(fit_q9)
+```
+
+    ## 
+    ## Call:
+    ## glm(formula = arrest_made ~ subject_race + subject_sex + contraband_drugs, 
+    ##     family = "binomial", data = df_data)
+    ## 
+    ## Deviance Residuals: 
+    ##     Min       1Q   Median       3Q      Max  
+    ## -1.0552  -0.9173  -0.8554   1.3795   1.7521  
+    ## 
+    ## Coefficients:
+    ##                        Estimate Std. Error z value Pr(>|z|)    
+    ## (Intercept)           -0.915799   0.056484 -16.213  < 2e-16 ***
+    ## subject_raceblack      0.009942   0.061088   0.163   0.8707    
+    ## subject_racehispanic   0.267780   0.059691   4.486 7.25e-06 ***
+    ## subject_racewhite      0.098885   0.057513   1.719   0.0855 .  
+    ## subject_raceother     -0.051305   0.144748  -0.354   0.7230    
+    ## subject_raceunknown  -10.550550  50.519824  -0.209   0.8346    
+    ## subject_sexfemale     -0.325179   0.024963 -13.026  < 2e-16 ***
+    ## contraband_drugsTRUE   0.353445   0.018865  18.735  < 2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 70218  on 55625  degrees of freedom
+    ## Residual deviance: 69577  on 55618  degrees of freedom
+    ##   (3360612 observations deleted due to missingness)
+    ## AIC: 69593
+    ## 
+    ## Number of Fisher Scoring iterations: 10
+
 **Observations**:
 
 - A very odd observation that the other section is so much higher than
   probable cause (\~4 times as high), which might give us some insight
   to the reasons for searching are often not justified by an
   observation, but potentially implicit bias
+- this fit model shows than being hispanic almost has the same impact on
+  u getting arrested as having drugs.
 
 ## Further Reading
 
