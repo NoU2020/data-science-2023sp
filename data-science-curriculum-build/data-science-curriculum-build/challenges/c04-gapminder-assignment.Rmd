@@ -72,8 +72,8 @@ gapminder %>%
 
 ```{r q1-task}
 ## TASK: Find the largest and smallest values of `year` in `gapminder`
-year_max <- max(gapminder$year, na.rm = TRUE)
-year_min <- min(gapminder$year, na.rm = TRUE)
+year_max <- max(gapminder %>% pull(year), na.rm = TRUE)
+year_min <- min(gapminder %>% pull(year), na.rm = TRUE)
 ```
 
 Use the following test to check your work.
@@ -100,6 +100,7 @@ You may encounter difficulties in visualizing these data; if so document your ch
 ```{r q2-task}
 ## TASK: Create a visual of gdpPercap vs continent
 gapminder %>%
+  filter(year==year_min) %>% 
   ggplot(aes(x = continent, y = gdpPercap, group = continent)) +
   geom_boxplot()+
   scale_y_log10()
@@ -119,22 +120,27 @@ gapminder %>%
 ```{r q3-task}
 ## TASK: Identify the outliers from q2
 gapminder %>% 
+  filter(year==year_min) %>% 
   filter(continent == "Europe") %>% 
   arrange(gdpPercap)
 
 gapminder %>% 
+  filter(year==year_min) %>% 
   filter(continent == "Asia") %>% 
   arrange(desc(gdpPercap))
 
 gapminder %>% 
+  filter(year==year_min) %>% 
   filter(continent == "Africa") %>% 
   arrange(desc(gdpPercap))
 
 gapminder %>% 
+  filter(year==year_min) %>% 
   filter(continent == "Americas") %>% 
   arrange(desc(gdpPercap))
 
 gapminder %>% 
+  filter(year==year_min) %>% 
   filter(continent == "Americas") %>% 
   arrange(gdpPercap)
 ```
@@ -167,22 +173,31 @@ gapminder %>%
 
 ```{r q4-task}
 ## TASK: Create a visual of gdpPercap vs continent
-gapminder %>%
-  filter(year == max(year)) %>%
 
-  ggplot(aes(continent, gdpPercap, group= continent)) +
+
+gapminder %>%
+  filter(year == max(year) | year == min(year)) %>%
+  ggplot(aes(x = continent, y = gdpPercap)) +
   geom_boxplot() +
   geom_point(
-    data = . %>% filter(country %in% c("Bosnia and Herzegovina", "Albania", "Kuwait", "Singapore", "Libya", "Gabon", "United States", "Canada", "Haiti")),
-    mapping = aes(color = country),
-    size = 2
-  )+
-  scale_y_log10()
+    data = . %>% filter(country %in% c("Bosnia and Herzegovina", "Albania", "Kuwait", "Singapore", "Libya", "Gabon", "United States", "Canada", "Haiti", "China")),
+    size = 3,
+    show.legend = TRUE
+  ) +
+  scale_y_log10() +
+  facet_wrap(~year) +
+  labs(title = "GDP per capita by continent and year",
+       x = "Year",
+       y = "GDP per capita (log scale)",
+       color = "Country",
+       shape = "Country") +
+  theme_bw()
+
 ```
 
 **Observations**:
 
-- Most of the outliers were correctly identified, except for Bosnia and Herzegovina, Albania, Singapore and Kuuwait, which aren't as much as outliers in their respective continents.
+- In general all continents saw a drastic increase in gdp except 1 outlier in americas. the different countries were successfully identified and generally stayed the same. i added china for fun and there was a very big jump in gdp over the 50 year time span.
 
 # Your Own EDA
 <!-- -------------------------------------------------- -->
@@ -228,7 +243,7 @@ gapminder %>%
 ```{r q5-task3}
 ## TASK: Your third graph
 gapminder %>%
-  filter(year == 2001:2003) %>%
+  filter(year == 1997:2007) %>%
 
   ggplot(aes(year, gdpPercap, group = year)) +
   geom_boxplot() +
@@ -239,4 +254,4 @@ gapminder %>%
   )
 ```
 
-- It is happening again and its looking humongo ugly ;-;
+- Trying a longer time frame worked! The general GDP dropped by a lot after 1997, which is curious because maybe 9/11 did have some impact.

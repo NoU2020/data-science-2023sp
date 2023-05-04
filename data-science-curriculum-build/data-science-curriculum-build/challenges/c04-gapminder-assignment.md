@@ -151,8 +151,8 @@ gapminder %>%
 
 ``` r
 ## TASK: Find the largest and smallest values of `year` in `gapminder`
-year_max <- max(gapminder$year, na.rm = TRUE)
-year_min <- min(gapminder$year, na.rm = TRUE)
+year_max <- max(gapminder %>% pull(year), na.rm = TRUE)
+year_min <- min(gapminder %>% pull(year), na.rm = TRUE)
 ```
 
 Use the following test to check your work.
@@ -202,6 +202,7 @@ can.
 ``` r
 ## TASK: Create a visual of gdpPercap vs continent
 gapminder %>%
+  filter(year==year_min) %>% 
   ggplot(aes(x = continent, y = gdpPercap, group = continent)) +
   geom_boxplot()+
   scale_y_log10()
@@ -225,108 +226,113 @@ gapminder %>%
 ``` r
 ## TASK: Identify the outliers from q2
 gapminder %>% 
+  filter(year==year_min) %>% 
   filter(continent == "Europe") %>% 
   arrange(gdpPercap)
 ```
 
-    ## # A tibble: 360 × 6
+    ## # A tibble: 30 × 6
     ##    country                continent  year lifeExp      pop gdpPercap
     ##    <fct>                  <fct>     <int>   <dbl>    <int>     <dbl>
     ##  1 Bosnia and Herzegovina Europe     1952    53.8  2791000      974.
-    ##  2 Bosnia and Herzegovina Europe     1957    58.4  3076000     1354.
-    ##  3 Albania                Europe     1952    55.2  1282697     1601.
-    ##  4 Bosnia and Herzegovina Europe     1962    61.9  3349000     1710.
-    ##  5 Albania                Europe     1957    59.3  1476505     1942.
-    ##  6 Turkey                 Europe     1952    43.6 22235677     1969.
-    ##  7 Bosnia and Herzegovina Europe     1967    64.8  3585000     2172.
-    ##  8 Turkey                 Europe     1957    48.1 25670939     2219.
-    ##  9 Albania                Europe     1962    64.8  1728137     2313.
-    ## 10 Turkey                 Europe     1962    52.1 29788695     2323.
-    ## # … with 350 more rows
+    ##  2 Albania                Europe     1952    55.2  1282697     1601.
+    ##  3 Turkey                 Europe     1952    43.6 22235677     1969.
+    ##  4 Bulgaria               Europe     1952    59.6  7274900     2444.
+    ##  5 Montenegro             Europe     1952    59.2   413834     2648.
+    ##  6 Portugal               Europe     1952    59.8  8526050     3068.
+    ##  7 Croatia                Europe     1952    61.2  3882229     3119.
+    ##  8 Romania                Europe     1952    61.0 16630000     3145.
+    ##  9 Greece                 Europe     1952    65.9  7733250     3531.
+    ## 10 Serbia                 Europe     1952    58.0  6860147     3581.
+    ## # … with 20 more rows
 
 ``` r
 gapminder %>% 
+  filter(year==year_min) %>% 
   filter(continent == "Asia") %>% 
   arrange(desc(gdpPercap))
 ```
 
-    ## # A tibble: 396 × 6
-    ##    country          continent  year lifeExp     pop gdpPercap
-    ##    <fct>            <fct>     <int>   <dbl>   <int>     <dbl>
-    ##  1 Kuwait           Asia       1957    58.0  212846   113523.
-    ##  2 Kuwait           Asia       1972    67.7  841934   109348.
-    ##  3 Kuwait           Asia       1952    55.6  160000   108382.
-    ##  4 Kuwait           Asia       1962    60.5  358266    95458.
-    ##  5 Kuwait           Asia       1967    64.6  575003    80895.
-    ##  6 Kuwait           Asia       1977    69.3 1140357    59265.
-    ##  7 Kuwait           Asia       2007    77.6 2505559    47307.
-    ##  8 Singapore        Asia       2007    80.0 4553009    47143.
-    ##  9 Kuwait           Asia       1997    76.2 1765345    40301.
-    ## 10 Hong Kong, China Asia       2007    82.2 6980412    39725.
-    ## # … with 386 more rows
+    ## # A tibble: 33 × 6
+    ##    country          continent  year lifeExp      pop gdpPercap
+    ##    <fct>            <fct>     <int>   <dbl>    <int>     <dbl>
+    ##  1 Kuwait           Asia       1952    55.6   160000   108382.
+    ##  2 Bahrain          Asia       1952    50.9   120447     9867.
+    ##  3 Saudi Arabia     Asia       1952    39.9  4005677     6460.
+    ##  4 Lebanon          Asia       1952    55.9  1439529     4835.
+    ##  5 Iraq             Asia       1952    45.3  5441766     4130.
+    ##  6 Israel           Asia       1952    65.4  1620914     4087.
+    ##  7 Japan            Asia       1952    63.0 86459025     3217.
+    ##  8 Hong Kong, China Asia       1952    61.0  2125900     3054.
+    ##  9 Iran             Asia       1952    44.9 17272000     3035.
+    ## 10 Singapore        Asia       1952    60.4  1127000     2315.
+    ## # … with 23 more rows
 
 ``` r
 gapminder %>% 
+  filter(year==year_min) %>% 
   filter(continent == "Africa") %>% 
   arrange(desc(gdpPercap))
 ```
 
-    ## # A tibble: 624 × 6
-    ##    country  continent  year lifeExp     pop gdpPercap
-    ##    <fct>    <fct>     <int>   <dbl>   <int>     <dbl>
-    ##  1 Libya    Africa     1977    57.4 2721783    21951.
-    ##  2 Gabon    Africa     1977    52.8  706367    21746.
-    ##  3 Libya    Africa     1972    52.8 2183877    21011.
-    ##  4 Libya    Africa     1967    50.2 1759224    18773.
-    ##  5 Libya    Africa     1982    62.2 3344074    17364.
-    ##  6 Gabon    Africa     1982    56.6  753874    15113.
-    ##  7 Gabon    Africa     1997    60.5 1126189    14723.
-    ##  8 Gabon    Africa     1992    61.4  985739    13522.
-    ##  9 Gabon    Africa     2007    56.7 1454867    13206.
-    ## 10 Botswana Africa     2007    50.7 1639131    12570.
-    ## # … with 614 more rows
+    ## # A tibble: 52 × 6
+    ##    country      continent  year lifeExp      pop gdpPercap
+    ##    <fct>        <fct>     <int>   <dbl>    <int>     <dbl>
+    ##  1 South Africa Africa     1952    45.0 14264935     4725.
+    ##  2 Gabon        Africa     1952    37.0   420702     4293.
+    ##  3 Angola       Africa     1952    30.0  4232095     3521.
+    ##  4 Reunion      Africa     1952    52.7   257700     2719.
+    ##  5 Djibouti     Africa     1952    34.8    63149     2670.
+    ##  6 Algeria      Africa     1952    43.1  9279525     2449.
+    ##  7 Namibia      Africa     1952    41.7   485831     2424.
+    ##  8 Libya        Africa     1952    42.7  1019729     2388.
+    ##  9 Congo, Rep.  Africa     1952    42.1   854885     2126.
+    ## 10 Mauritius    Africa     1952    51.0   516556     1968.
+    ## # … with 42 more rows
 
 ``` r
 gapminder %>% 
+  filter(year==year_min) %>% 
   filter(continent == "Americas") %>% 
   arrange(desc(gdpPercap))
 ```
 
-    ## # A tibble: 300 × 6
+    ## # A tibble: 25 × 6
     ##    country       continent  year lifeExp       pop gdpPercap
     ##    <fct>         <fct>     <int>   <dbl>     <int>     <dbl>
-    ##  1 United States Americas   2007    78.2 301139947    42952.
-    ##  2 United States Americas   2002    77.3 287675526    39097.
-    ##  3 Canada        Americas   2007    80.7  33390141    36319.
-    ##  4 United States Americas   1997    76.8 272911760    35767.
-    ##  5 Canada        Americas   2002    79.8  31902268    33329.
-    ##  6 United States Americas   1992    76.1 256894189    32004.
-    ##  7 United States Americas   1987    75.0 242803533    29884.
-    ##  8 Canada        Americas   1997    78.6  30305843    28955.
-    ##  9 Canada        Americas   1987    76.9  26549700    26627.
-    ## 10 Canada        Americas   1992    78.0  28523502    26343.
-    ## # … with 290 more rows
+    ##  1 United States Americas   1952    68.4 157553000    13990.
+    ##  2 Canada        Americas   1952    68.8  14785584    11367.
+    ##  3 Venezuela     Americas   1952    55.1   5439568     7690.
+    ##  4 Argentina     Americas   1952    62.5  17876956     5911.
+    ##  5 Uruguay       Americas   1952    66.1   2252965     5717.
+    ##  6 Cuba          Americas   1952    59.4   6007797     5587.
+    ##  7 Chile         Americas   1952    54.7   6377619     3940.
+    ##  8 Peru          Americas   1952    43.9   8025700     3759.
+    ##  9 Ecuador       Americas   1952    48.4   3548753     3522.
+    ## 10 Mexico        Americas   1952    50.8  30144317     3478.
+    ## # … with 15 more rows
 
 ``` r
 gapminder %>% 
+  filter(year==year_min) %>% 
   filter(continent == "Americas") %>% 
   arrange(gdpPercap)
 ```
 
-    ## # A tibble: 300 × 6
-    ##    country            continent  year lifeExp     pop gdpPercap
-    ##    <fct>              <fct>     <int>   <dbl>   <int>     <dbl>
-    ##  1 Haiti              Americas   2007    60.9 8502814     1202.
-    ##  2 Haiti              Americas   2002    58.1 7607651     1270.
-    ##  3 Haiti              Americas   1997    56.7 6913545     1342.
-    ##  4 Dominican Republic Americas   1952    45.9 2491346     1398.
-    ##  5 Haiti              Americas   1967    46.2 4318137     1452.
-    ##  6 Haiti              Americas   1992    55.1 6326682     1456.
-    ##  7 Dominican Republic Americas   1957    49.8 2923186     1544.
-    ##  8 Dominican Republic Americas   1967    56.8 4049146     1654.
-    ##  9 Haiti              Americas   1972    48.0 4698301     1654.
-    ## 10 Dominican Republic Americas   1962    53.5 3453434     1662.
-    ## # … with 290 more rows
+    ## # A tibble: 25 × 6
+    ##    country            continent  year lifeExp      pop gdpPercap
+    ##    <fct>              <fct>     <int>   <dbl>    <int>     <dbl>
+    ##  1 Dominican Republic Americas   1952    45.9  2491346     1398.
+    ##  2 Haiti              Americas   1952    37.6  3201488     1840.
+    ##  3 Paraguay           Americas   1952    62.6  1555876     1952.
+    ##  4 Brazil             Americas   1952    50.9 56602560     2109.
+    ##  5 Colombia           Americas   1952    50.6 12350771     2144.
+    ##  6 Honduras           Americas   1952    41.9  1517453     2195.
+    ##  7 Guatemala          Americas   1952    42.0  3146381     2428.
+    ##  8 Panama             Americas   1952    55.2   940080     2480.
+    ##  9 Costa Rica         Americas   1952    57.2   926317     2627.
+    ## 10 Bolivia            Americas   1952    40.4  2883315     2677.
+    ## # … with 15 more rows
 
 **Observations**:
 
@@ -365,26 +371,35 @@ variables; think about using different aesthetics or facets.
 
 ``` r
 ## TASK: Create a visual of gdpPercap vs continent
-gapminder %>%
-  filter(year == max(year)) %>%
 
-  ggplot(aes(continent, gdpPercap, group= continent)) +
+
+gapminder %>%
+  filter(year == max(year) | year == min(year)) %>%
+  ggplot(aes(x = continent, y = gdpPercap)) +
   geom_boxplot() +
   geom_point(
-    data = . %>% filter(country %in% c("Bosnia and Herzegovina", "Albania", "Kuwait", "Singapore", "Libya", "Gabon", "United States", "Canada", "Haiti")),
-    mapping = aes(color = country),
-    size = 2
-  )+
-  scale_y_log10()
+    data = . %>% filter(country %in% c("Bosnia and Herzegovina", "Albania", "Kuwait", "Singapore", "Libya", "Gabon", "United States", "Canada", "Haiti", "China")),
+    size = 3,
+    show.legend = TRUE
+  ) +
+  scale_y_log10() +
+  facet_wrap(~year) +
+  labs(title = "GDP per capita by continent and year",
+       x = "Year",
+       y = "GDP per capita (log scale)",
+       color = "Country",
+       shape = "Country") +
+  theme_bw()
 ```
 
 ![](c04-gapminder-assignment_files/figure-gfm/q4-task-1.png)<!-- -->
 
 **Observations**:
 
-- Most of the outliers were correctly identified, except for Bosnia and
-  Herzegovina, Albania, Singapore and Kuuwait, which aren’t as much as
-  outliers in their respective continents.
+- In general all continents saw a drastic increase in gdp except 1
+  outlier in americas. the different countries were successfully
+  identified and generally stayed the same. i added china for fun and
+  there was a very big jump in gdp over the 50 year time span.
 
 # Your Own EDA
 
@@ -447,7 +462,7 @@ gapminder %>%
 ``` r
 ## TASK: Your third graph
 gapminder %>%
-  filter(year == 2001:2003) %>%
+  filter(year == 1997:2007) %>%
 
   ggplot(aes(year, gdpPercap, group = year)) +
   geom_boxplot() +
@@ -458,6 +473,10 @@ gapminder %>%
   )
 ```
 
+    ## Warning in year == 1997:2007: longer object length is not a multiple of shorter
+    ## object length
+
 ![](c04-gapminder-assignment_files/figure-gfm/q5-task3-1.png)<!-- -->
 
-- It is happening again and its looking humongo ugly ;-;
+- Trying a longer time frame worked! The general GDP dropped by a lot
+  after 1997, which is curious because maybe 9/11 did have some impact.
