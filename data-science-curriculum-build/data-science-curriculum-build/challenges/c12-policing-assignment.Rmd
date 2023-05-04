@@ -48,15 +48,19 @@ library(broom)
 
 ```{r q1-task}
 ## TODO: Download the data, move to your data folder, and load it
-filename <- NA_character_
+filename <- "./data/yg821jf8611_ma_statewide_2020_04_01.rds"
 df_data <- readRDS(filename)
 ```
 
 # EDA
 <!-- -------------------------------------------------- -->
+```{r}
+glimpse(df_data)
+```
+
 
 ### __q2__ Do your "first checks" on the dataset. What are the basic facts about this dataset?
-
+Theres 24 columns involving the dates, location, general subject information, arrest related information, and vechile type and raw race
 
 Note that we have both a `subject_race` and `race_Raw` column. There are a few possibilities as to what `race_Raw` represents:
 
@@ -69,14 +73,25 @@ Let's try to distinguish between these two possibilities.
 
 ```{r q3-task}
 ## TODO: Determine the factor levels for subject_race and raw_Race
+levels(df_data$subject_race)
+```
+
+
+```{r q3-task-1}
+levels(df_data$raw_Race)
+
 ```
 
 **Observations**:
 
 - What are the unique values for `subject_race`?
+asian/pacific islander, black, hispanic, white, other, unknown
 - What are the unique values for `raw_Race`?
+White, Hispanic, Black, Asian or Pacific Islander, Middle Eastern or East Indian (South Asian), American Indian or Alaskan Native, None - for no operator present citations only
 - What is the overlap between the two sets?
+asian/pacific islander, black, hispanic, white
 - What is the difference between the two sets?
+other and unknown are broken down into more specific races.
 
 ### __q4__ Check whether `subject_race` and `raw_Race` match for a large fraction of cases. Which of the two hypotheses above is most likely, based on your results?
 
@@ -84,6 +99,15 @@ Let's try to distinguish between these two possibilities.
 
 ```{r q4-task}
 ## TODO: Devise your own way to test the hypothesis posed above.
+## Create a contingency table of the two variables
+cont_table <- table(df_data$subject_race, df_data$raw_Race)
+
+## Calculate the proportion of cases where the two variables match
+match_prop <- sum(diag(cont_table)) / sum(cont_table)
+
+## Print the proportion
+match_prop
+
 ```
 
 **Observations**
@@ -95,7 +119,7 @@ Between the two hypotheses:
 
 which is most plausible, based on your results?
 
-- (Your response here)
+- I think its more plausible that race_Raw refers to the race of the police officer, especially since race_Raw has a category of "None - no operators present, citations only". (I'm not really using the data from q4 because i think the captializations are different and it impacted the result)
 
 ## Vis
 <!-- ------------------------- -->
@@ -103,16 +127,52 @@ which is most plausible, based on your results?
 ### __q5__ Compare the *arrest rate*---the fraction of total cases in which the subject was arrested---across different factors. Create as many visuals (or tables) as you need, but make sure to check the trends across all of the `subject` variables. Answer the questions under *observations* below.
 
 (Note: Create as many chunks and visuals as you need)
+```{r}
+## Create a bar plot of mean arrest rate by subject_race
+
+
+race_summary <-df_data %>%
+  group_by(subject_race) %>%
+  na.omit(subject_race) %>% 
+  summarize(arrest_rate = mean(arrest_made)) %>%
+  ggplot(aes(x = subject_race, y = arrest_rate)) +
+  geom_col()
+
+## Print the bar plot
+race_summary
+
+age_summary <-df_data %>%
+  group_by(subject_age) %>%
+  na.omit(subject_age) %>% 
+  summarize(arrest_rate = mean(arrest_made)) %>%
+  ggplot(aes(x = subject_age, y = arrest_rate)) +
+  geom_col()
+
+## Print the bar plot
+age_summary
+
+sex_summary <-df_data %>%
+  group_by(subject_sex) %>%
+  na.omit(subject_sex) %>% 
+  summarize(arrest_rate = mean(arrest_made)) %>%
+  ggplot(aes(x = subject_sex, y = arrest_rate)) +
+  geom_col()
+
+## Print the bar plot
+sex_summary
+
+
+```
 
 
 **Observations**:
 
 - How does `arrest_rate` tend to vary with `subject_age`?
-  - (Your response here)
+  - There is a spike in arrest rate on 2 very specific younger ages, then the arrest rate tends to increase with age
 - How does `arrest_rate` tend to vary with `subject_sex`?
-  - (Your response here)
+  - males tend to have a higher arrest rate of about 0.07.
 - How does `arrest_rate` tend to vary with `subject_race`?
-  - (Your response here)
+  - the other races all tend to have similar arrest rates other than hispanic race, which is at least 0.05 higher than all other races
 
 # Modeling
 <!-- -------------------------------------------------- -->
@@ -140,9 +200,9 @@ fit_q6 %>% tidy()
 **Observations**:
 
 - Which `subject_race` levels are included in fitting the model?
-  - (Your response here)
+  -hispanic black and white
 - Which `subject_race` levels have terms in the model?
-  - (Your response here)
+  - hispanic and white
 
 You should find that each factor in the model has a level *missing* in its set of terms. This is because R represents factors against a *reference level*: The model treats one factor level as "default", and each factor model term represents a change from that "default" behavior. For instance, the model above treats `subject_sex==male` as the reference level, so the `subject_sexfemale` term represents the *change in probability* of arrest due to a person being female (rather than male).
 
@@ -155,18 +215,23 @@ By default `glm` uses the first factor level present as the reference level. The
 ```{r q7-task}
 ## TODO: Re-fit the logistic regression, but set "white" as the reference
 ## level for subject_race
-
+## Refit the logistic regression with "white" as the reference level for subject_race
+fit_q7 <- glm(arrest_made ~ subject_race %>% fct_relevel("white") + subject_sex + subject_age, data = df_data, family = "binomial")
 fit_q7 %>% tidy()
+## Print the summary of the fitted model
+summary(fit_q7)
+
+
 ```
 
 **Observations**:
 
 - Which `subject_race` level has the highest probability of being arrested, according to this model? Which has the lowest probability?
-  - (Your response here)
+  - according to this model, hispanics have the highest probability of being arrested, and asian/pacific isladers have the lowest probability
 - What could explain this difference in probabilities of arrest across race? List **multiple** possibilities.
-  - (Your response here)
+  - well people could be predisposed to react to a certain race a certain way (aka racist), they could also have different base numbers, for example there might be less other races than white or smth, certain races might also be more or less prevalent with vehicle related professions.
 - Look at the sent of variables in the dataset; do any of the columns relate to a potential explanation you listed?
-  - (Your response here)
+  - females, age, hispanic and asian/pacific islander all have a p value of 0.
 
 One way we can explain differential arrest rates is to include some measure indicating the presence of an arrestable offense. We'll do this in a particular way in the next task.
 
@@ -175,21 +240,40 @@ One way we can explain differential arrest rates is to include some measure indi
 ```{r q8-task}
 ## TODO: Repeat the modeling above, but control for whether contraband was found
 ## during the police stop
+
+## Fit the logistic regression with contraband as a predictor variable
+fit_q8 <- glm(arrest_made ~ subject_race + subject_sex + subject_age + contraband_found, data = df_data, family = "binomial")
 fit_q8 %>% tidy()
+## Print the summary of the fitted model
+summary(fit_q8)
+
 ```
 
 **Observations**:
 
 - How does controlling for found contraband affect the `subject_race` terms in the model?
-  - (Your response here)
+  - it removes the asian pacific race for a factor, and increases the p value of races in general
 - What does the *finding of contraband* tell us about the stop? What does it *not* tell us about the stop?
-  - (Your response here)
-
+  - It still doesnt tell us if the stop or the prompt of searching of contraband was racially motivated or not.
 ### __q9__ Go deeper: Pose at least one more question about the data and fit at least one more model in support of answering that question.
+
+```{r}
+search_summary <-df_data %>%
+  group_by(search_basis) %>%
+  na.omit(search_basis) %>% 
+  summarize(arrest_rate = mean(arrest_made)) %>%
+  ggplot(aes(x = search_basis, y = arrest_rate)) +
+  geom_col()
+
+## Print the bar plot
+search_summary
+
+```
+
 
 **Observations**:
 
-- Document your question and findings
+- A very odd observation that the other section is so much higher than probable cause (~4 times as high), which might give us some insight to the reasons for searching are often not justified by an observation, but potentially implicit bias
 
 ## Further Reading
 <!-- -------------------------------------------------- -->
