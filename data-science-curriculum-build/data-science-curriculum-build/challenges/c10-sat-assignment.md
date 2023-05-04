@@ -246,9 +246,9 @@ df_composite_long <- pivot_longer(df_composite, cols = c("high_GPA", "both_SAT")
 
 
 # Create the scatter plot with a regression line
-ggplot(df_composite_long, aes(x = univ_GPA, y = value, color = variable)) +
+ggplot(df_composite_long, aes(x = value, y = univ_GPA, color = variable)) +
   geom_point() +
-  labs(x = "University GPA", y = "Both SAT score", color = "") +
+  labs(y = "University GPA", x = "Both SAT score", color = "") +
   theme_bw()
 ```
 
@@ -374,7 +374,8 @@ cat("Confidence interval for the correlation:", round(cor_test_both_univ$conf.in
 
 - Which correlations are significantly nonzero?
   - I would say both highschool GPA and both SAT were significantly
-    nonzero.
+    nonzero as neither of the CI’s include 0, meaning they are
+    significant.
 - Which of `high_GPA` and `both_SAT` seems to be more strongly
   correlated with `univ_GPA`?
   - high_GPA has a higher correlation with a 0.1 stronger correlation.
@@ -534,10 +535,10 @@ fit_basic %>%
   this coefficient significantly different from zero?
   - 0.00198 to 0.00349
 - By itself, how well does `both_SAT` predict `univ_GPA`?
-  - by itself a 100 increase in sat means roughly a 0.2 increase in GPA,
-    which is not insignificant, but not a good enough indicator of GPA.
-    The r squared value is less thahn 0.5, which means it is pretty
-    weak.
+  - by itself it is a ok as the r squaredvalue is 0.46, which is not
+    great but not bad either, it is also very unlikely that it occured
+    to chance as the p value is very close to 0. roughly for each point
+    in increase of SAT score, the students GPA would go up by 0.002
 
 Remember from `e-model03-interp-warnings` that there are challenges with
 interpreting regression coefficients! Let’s investigate that idea
