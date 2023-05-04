@@ -369,10 +369,8 @@ df_norm_pof
 - Assuming your scopus is the probability of failure `POF` defined
   above, does your estimate exhibit real variability, induced
   variability, or both?
-  - The estimate of POF exhibits real variability, which is reflected in
-    the standard error of the estimate. This variability arises due to
-    the random nature of the Monte Carlo simulation used to estimate
-    POF.
+  - The estimate of POF exhibits induced variability as the underlying
+    distribution is not changing.
 - Does this confidence interval imply that `POF < 0.03`?
   - We have done some pretty rigiours testing and simulations to show
     that we can be confident POF\<0.03, but it is still an estimation,
@@ -382,24 +380,20 @@ df_norm_pof
   - It is more trustworthy
 - Does the confidence interval above account for uncertainty arising
   from the *Monte Carlo approximation*? Why or why not?
-  - No, the confidence interval above only accounts for the uncertainty
-    in the estimate of the probability of failure arising from the
-    finite Monte Carlo sample size. It does not account for any
-    uncertainty arising from the fact that we are approximating the
-    distribution of the strength with a lognormal distribution or any
-    other assumptions we have made about the model.
+  - There is a chance that there is uncertainty from the monte carlo
+    approximation sample size, but we used a sample of 1,000,000, so the
+    uncertainty from the approximation should be minimal.
 - Does the confidence interval above account for uncertainty arising
   from *limited physical tests* (`df_samples`)? Why or why not?
-  - Yes, the limited physical tests influences the approximation of the
-    distribution of the strength with a lognormal distribution.
+  - No, because the interval is generated from a data set based on
+    df_samples, not using df_samples directly.
 - What could you do to tighten up the confidence interval?
   - Have more physical test samples to base the monte carlo simulation
     on.
 - Can you *confidently* conclude that `POF < 0.03`? Why or why not?
-  - With what I have, I am more confident in the conclusion that POF \<
-    0.03. Despite the smaller sample size, 25 samples are strong enough
-    and the original distribution appears to follow a lognormal
-    distribution
+  - Not really, there is a lot of things that this method does not
+    account for and a different approach would make me more confident in
+    the POF value.
 
 ## A different way to compute the POF
 
@@ -476,14 +470,14 @@ df_samples %>% estimate_pof()
     estimate the probability of failure.
 - Does this estimate have any uncertainty due to *limited physical
   tests*? Why or why not?
-  - No, this estimate does not have any uncertainty due to limited
-    physical tests because it is based on a mathematical model of the
-    system, rather than physical testing.
+  - Yes, the estimate is based on a mathematical model that is fit to
+    only 25 tests. The uncertainty from limited physical tests is thus
+    built into the model.
 - With the scopus as the `POF`, would uncertainty due to *limited
   physical tests* be induced or real?
-  - Uncertainty due to limited physical tests would be real uncertainty,
-    as it reflects the actual variation and lack of knowledge about the
-    behavior of the system.
+  - Uncertainty due to limited physical tests would be induced
+    uncertainty, as the fundemental distribution of the data will not be
+    changing.
 
 ## Quantifying sampling uncertainty
 
@@ -528,11 +522,9 @@ df_samples %>%
     uncertainty arising from the Monte Carlo approximation of the POF.
 - Does the confidence interval above account for uncertainty arising
   from *limited physical tests* (`df_samples`)? Why or why not? -The
-  confidence interval above does not account for uncertainty arising
-  from limited physical tests (df_samples). This is because the
-  bootstrapping method assumes that the sample is representative of the
-  population and does not account for any bias or variability due to the
-  limited sample size or selection.
+  confidence interval above does account for uncertainty arising from
+  limited physical tests (df_samples) as the method explicitly
+  quantifies uncertainty from a limited sample
 - Can you confidently conclude that `POF < 0.03`? Why or why not?
   - It is not possible to confidently conclude that POF \< 0.03 based on
     the current analysis alone. The 95% confidence interval for the POF
