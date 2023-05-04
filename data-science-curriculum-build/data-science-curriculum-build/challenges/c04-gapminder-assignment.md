@@ -213,8 +213,9 @@ gapminder %>%
 **Observations**:
 
 - There tends to be more higher outliers than lower outliers
-- On average, Oceania has the highest gdp while africa has the lowest.
-  Which to be fair, Oceania probably has the least amount of countries
+- On average, the gdp tends to be pretty low for all the continents,
+  with asia and africa being lower. oceania has a pretty high average as
+  it only has a few countries and are mostly under western influence.
 
 **Difficulties & Approaches**:
 
